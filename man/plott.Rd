@@ -4,12 +4,12 @@
 \alias{plott}
 \title{plot GC-MS data as a heatmap for constant speed of temperature rising}
 \usage{
-plott(data, col = heat.colors(108), temp = c(100, 320))
+plott(data, log = F, temp = c(100, 320))
 }
 \arguments{
 \item{data}{imported data matrix of GC-MS}
 
-\item{col}{custumized color}
+\item{log}{transform the intensity into log based 10}
 
 \item{temp}{temprature range for constant speed}
 }
@@ -19,4 +19,9 @@ heatmap
 \description{
 plot GC-MS data as a heatmap for constant speed of temperature rising
 }
-
+\examples{
+\dontrun{
+matrix <- getmd(rawdata)
+plott(matrix)
+}
+}

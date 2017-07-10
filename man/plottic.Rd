@@ -21,4 +21,9 @@ plot
 \description{
 Plot Total Ion Chromatogram (TIC)
 }
-
+\examples{
+\dontrun{
+matrix <- getmd(rawdata)
+plottic(matrix)
+}
+}
