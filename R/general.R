@@ -1,3 +1,18 @@
+#' define the Mode function
+#' @param x vector
+#' @return Mode of the vector
+#' @export
+Mode = function(x) {
+        ta = table(x)
+        tam = max(ta)
+        if (all(ta == tam))
+                mod = x
+        else if (is.numeric(x))
+                mod = as.numeric(names(ta)[ta == tam])
+        else
+                mod = names(ta)[ta == tam]
+        return(mod)
+}
 #' filter data by average moving box
 #'
 #' @param x a vector
@@ -9,6 +24,44 @@
 ma <- function(x, n) {
         stats::filter(x, rep(1 / n, n), circular = T)
 }
+#' Get mass defect with certain scaled factor
+#' @param mass vector of mass
+#' @param sf scaled factors
+#' @return dataframe with mass, scaled mass and scaled mass defect
+#' @examples
+#' mass <- c(100.1022,245.2122,267.3144,400.1222,707.2294)
+#' sf <- 0.9988
+#' mf <- getmassdefect(mass,sf)
+#' @seealso \code{\link{plotkms}}
+#' @export
+
+getmassdefect <- function(mass, sf) {
+        sm <- mass * sf
+        sd <- round(sm) - sm
+        df <- as.data.frame(cbind(mass, sm, sd))
+        graphics::plot(df$sd ~ df$sm, xlab = "m/z", ylab = "scaled MD")
+        return(df)
+}
+#' plot the kendrick mass defect diagram
+#' @param data vector with the name m/z
+#' @param cutoff remove the low intensity
+#' @return NULL
+#' @seealso \code{\link{getmassdefect}}
+#' @examples
+#' \dontrun{
+#' mz <- c(10000,5000,20000,100,40000)
+#' names(mz) <- c(100.1022,245.2122,267.3144,400.1222,707.2294)
+#' plotkms(mz)
+#' }
+#' @export
+plotkms <- function(data, cutoff = 1000) {
+        data <- data[data > cutoff]
+        mz <- as.numeric(names(data))
+        km <- mz * 14 / 14.01565
+        kmd <- round(km) - km
+        graphics::smoothScatter(kmd ~ round(km), xlab = "Kendrick nominal mass",
+                                ylab = "Kendrick mass defect")
+}
 
 #' Import data and return the annotated matrix for GC/LC-MS by m/z range and retention time
 #' @param data file type which xcmsRaw could handle
@@ -19,7 +72,7 @@ ma <- function(x, n) {
 #' @examples
 #' \dontrun{
 #' library(faahKO)
-#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdfpath <- system.file('cdf', package = 'faahKO')
 #' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
 #' matrix <- getmd(cdffiles[1])
 #' }
@@ -61,12 +114,14 @@ cbmd <- function(data1,
         z1 <- getmd(data1, mzstep = mzstep)
         z2 <- getmd(data2, mzstep = mzstep)
         roundrt <- -log10(rtstep)
-        z <-
-                rbind(z1[, which(round(as.numeric(colnames(z1)), roundrt) %in% round(as.numeric(colnames(z2)), roundrt))], z2[, which(round(as.numeric(colnames(z2)), roundrt) %in% round(as.numeric(colnames(z1)), roundrt))])
+        z <- rbind(z1[, which(round(as.numeric(colnames(z1)),
+                                    roundrt) %in% round(as.numeric(colnames(z2)), roundrt))],
+                   z2[, which(round(as.numeric(colnames(z2)), roundrt) %in%
+                                      round(as.numeric(colnames(z1)), roundrt))])
         rownames(z) <- c(rownames(z1), rownames(z2))
-        colnames(z) <-
-                intersect(round(as.numeric(colnames(z1)), roundrt),
-                          round(as.numeric(colnames(z2)), roundrt))
+        colnames(z) <- intersect(round(as.numeric(colnames(z1)),
+                                       roundrt),
+                                 round(as.numeric(colnames(z2)), roundrt))
         return(z)
 }
 
@@ -80,7 +135,7 @@ cbmd <- function(data1,
 #' @examples
 #' \dontrun{
 #' library(faahKO)
-#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdfpath <- system.file('cdf', package = 'faahKO')
 #' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
 #' matrix <- submd(cdffiles[1],cdffiles[7])
 #' }
@@ -94,10 +149,12 @@ submd <- function(data1,
         roundmz <- -log10(mzstep)
         roundrt <- -log10(rtstep)
 
-        z10 <-
-                z1[which(round(as.numeric(rownames(z1)), roundmz) %in% round(as.numeric(rownames(z2)), roundmz)), which(round(as.numeric(colnames(z1)), roundrt) %in% round(as.numeric(colnames(z2)), roundrt))]
-        z20 <-
-                z2[which(round(as.numeric(rownames(z2)), roundmz) %in% round(as.numeric(rownames(z1)), roundmz)), which(round(as.numeric(colnames(z2)), roundrt) %in% round(as.numeric(colnames(z1)), roundrt))]
+        z10 <- z1[which(round(as.numeric(rownames(z1)), roundmz) %in%
+                                round(as.numeric(rownames(z2)), roundmz)), which(round(as.numeric(colnames(z1)),
+                                                                                       roundrt) %in% round(as.numeric(colnames(z2)), roundrt))]
+        z20 <- z2[which(round(as.numeric(rownames(z2)), roundmz) %in%
+                                round(as.numeric(rownames(z1)), roundmz)), which(round(as.numeric(colnames(z2)),
+                                                                                       roundrt) %in% round(as.numeric(colnames(z1)), roundrt))]
 
         z <- z10 - z20
         z[z < 0] <- 0
@@ -105,30 +162,41 @@ submd <- function(data1,
         z0[z0 < 0] <- 0
 
         rownames(z0) <-
-                rownames(z) <-
-                intersect(round(as.numeric(rownames(z1)), roundmz),
-                          round(as.numeric(rownames(z2)), roundmz))
+                rownames(z) <- intersect(round(as.numeric(rownames(z1)),
+                                               roundmz),
+                                         round(as.numeric(rownames(z2)), roundmz))
         colnames(z0) <-
-                colnames(z) <-
-                intersect(round(as.numeric(colnames(z1)), roundrt),
-                          round(as.numeric(colnames(z2)), roundrt))
+                colnames(z) <- intersect(round(as.numeric(colnames(z1)),
+                                               roundrt),
+                                         round(as.numeric(colnames(z2)), roundrt))
         xlim <- range(as.numeric(colnames(z)))
         ylim <- range(as.numeric(rownames(z)))
 
         graphics::par(mfrow = c(2, 2))
 
-        plotmz(z10,main = 'data 1',xlim = xlim,ylim = ylim)
-        plotmz(z20,main = 'data 2',xlim = xlim,ylim = ylim)
-        plotmz(z, main = 'data1 - data2',xlim = xlim,ylim = ylim)
-        plotmz(z0, main = 'data2 - data1',xlim = xlim,ylim = ylim)
+        plotmz(z10,
+               main = "data 1",
+               xlim = xlim,
+               ylim = ylim)
+        plotmz(z20,
+               main = "data 2",
+               xlim = xlim,
+               ylim = ylim)
+        plotmz(z,
+               main = "data1 - data2",
+               xlim = xlim,
+               ylim = ylim)
+        plotmz(z0,
+               main = "data2 - data1",
+               xlim = xlim,
+               ylim = ylim)
 
-        li <-
-                list(
-                        data1 = z10,
-                        data2 = z20,
-                        data1s2 = z,
-                        data2s1 = z0
-                )
+        li <- list(
+                data1 = z10,
+                data2 = z20,
+                data1s2 = z,
+                data2s1 = z0
+        )
         return(li)
 }
 
@@ -141,7 +209,7 @@ submd <- function(data1,
 #' @examples
 #' \dontrun{
 #' library(faahKO)
-#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdfpath <- system.file('cdf', package = 'faahKO')
 #' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
 #' matrix <- getmd(cdffiles[1])
 #' png('test.png')
@@ -156,7 +224,8 @@ plotms <- function(data, log = F) {
         indrt <- as.numeric(colnames(data))
         col <-
                 (grDevices::colorRampPalette(rev(
-                        RColorBrewer::brewer.pal(11,"RdYlBu")
+                        RColorBrewer::brewer.pal(11,
+                                                 "RdYlBu")
                 )))(100)
         if (log) {
                 z <- log10(t(data) + 1)
@@ -164,8 +233,8 @@ plotms <- function(data, log = F) {
                 z <- t(data)
         }
         # show the intensity scale in log 10 based scale
-        graphics::par(mar = c(2, 5, 1, 4), fig = c(0, 1,
-                                                   0.9, 1))
+        graphics::par(mar = c(2, 5, 1, 4), fig = c(0, 1, 0.9,
+                                                   1))
         zlim <- range(z, na.rm = T)
         breaks <- seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
         poly <- vector(mode = "list", length(col))
@@ -209,7 +278,8 @@ plotms <- function(data, log = F) {
                                                            1))
         for (i in seq(poly)) {
                 graphics::polygon(
-                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
+                        c(bks[i], bks[i + 1], bks[i +
+                                                          1], bks[i]),
                         c(0, 0, 1, 1),
                         col = col[i],
                         border = NA
@@ -218,8 +288,8 @@ plotms <- function(data, log = F) {
         # show the heatmap
         graphics::par(
                 mar = c(4, 5, 0, 4),
-                fig = c(0, 1,
-                        0, 0.9),
+                fig = c(0, 1, 0,
+                        0.9),
                 new = T
         )
         graphics::image(
@@ -231,7 +301,9 @@ plotms <- function(data, log = F) {
         )
         # display the m/z as y
         mzy <- seq(0, 1, length.out = length(indmz))
-        graphics::axis(4, at = mzy[indmz %% 100 == 0][-c(1, sum(indmz %% 100 == 0))], labels = c(rep("", length(indmz[indmz %% 100 == 0])))[-c(1, sum(indmz %% 100 == 0))])
+        graphics::axis(4, at = mzy[indmz %% 100 == 0][-c(1, sum(indmz %% 100 ==
+                                                                        0))], labels = c(rep("", length(indmz[indmz %% 100 ==
+                                                                                                                      0])))[-c(1, sum(indmz %% 100 == 0))])
         # add the lable for double y axis
         graphics::text(
                 graphics::par("usr")[2] * 1.11,
@@ -243,15 +315,17 @@ plotms <- function(data, log = F) {
         )
         graphics::text(
                 graphics::par("usr")[2] * 1.05,
-                mzy[indmz %% 100 == 0][-c(1, sum(indmz %% 100 == 0))],
-                labels = indmz[indmz %% 100 == 0][-c(1, sum(indmz %% 100 == 0))],
+                mzy[indmz %% 100 ==
+                            0][-c(1, sum(indmz %% 100 == 0))],
+                labels = indmz[indmz %% 100 ==
+                                       0][-c(1, sum(indmz %% 100 == 0))],
                 srt = 270,
                 xpd = TRUE
         )
         graphics::par(
                 mar = c(4, 5, 4, 4),
-                fig = c(0, 1,
-                        0, 0.9),
+                fig = c(0, 1, 0,
+                        0.9),
                 new = T,
                 cex.lab = 1
         )
@@ -271,13 +345,13 @@ plotms <- function(data, log = F) {
 #' plot GC/LC-MS data as scatter plot
 #'
 #' @param data imported data matrix of GC-MS
-#' @param threshold the threshold of the response (log based 10)
+#' @param inscf Log intensity cutoff for peaks, default 5
 #' @param ... parameters for `plot` function
 #' @return scatter plot
 #' @examples
 #' \dontrun{
 #' library(faahKO)
-#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdfpath <- system.file('cdf', package = 'faahKO')
 #' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
 #' matrix <- getmd(cdffiles[1])
 #' png('test.png')
@@ -285,22 +359,53 @@ plotms <- function(data, log = F) {
 #' dev.off()
 #' }
 #' @export
-plotmz <- function(data, threshold = 5,...){
+plotmz <- function(data, inscf = 5, ...) {
         mz <- as.numeric(rownames(data))
         rt <- as.numeric(colnames(data))
-        z <- log10(data+1)
-        z[z<threshold] <- NA
+        z <- log10(data + 1)
+        cex = as.numeric(cut(z - inscf, breaks = c(0, 1, 2,
+                                                   3, 4, Inf) / 2)) / 2
+        cexlab = c(
+                paste0(inscf, "-", inscf + 0.5),
+                paste0(inscf +
+                               0.5, "-", inscf + 1),
+                paste0(inscf + 1, "-", inscf +
+                               1.5),
+                paste0(inscf + 1.5, "-", inscf + 2),
+                paste0(">",
+                       inscf + 2)
+        )
+
+        z[z < inscf] <- NA
         corr <- which(!is.na(z), arr.ind = TRUE)
-        mz0 <- mz[corr[,1]]
-        rt0 <- rt[corr[,2]]
+        mz0 <- mz[corr[, 1]]
+        rt0 <- rt[corr[, 2]]
         int <- z[which(!is.na(z))]
 
-        graphics::plot(mz0~rt0,
-             pch = 19,
-             cex = int - threshold + 1,
-             col = grDevices::rgb(0,0, 0, 0.1),
-             xlab = "retention time(s)",
-             ylab = "m/z",...)
+        graphics::par(mar = c(5, 4.2, 6.1, 2.1), xpd = TRUE)
+        graphics::plot(
+                mz0 ~ rt0,
+                pch = 19,
+                cex = cex,
+                col = grDevices::rgb(0,
+                                     0, 1, 0.1),
+                xlab = "retention time(s)",
+                ylab = "m/z",
+                ...
+        )
+        graphics::legend(
+                "top",
+                legend = cexlab,
+                title = "Intensity in Log scale",
+                pt.cex = c(1, 2, 3, 4, 5) / 2,
+                pch = 19,
+                bty = "n",
+                horiz = T,
+                cex = 0.7,
+                col = grDevices::rgb(0, 0,
+                                     1, 0.1),
+                inset = c(0,-0.25)
+        )
 }
 
 #' plot GC-MS data as a heatmap for constant speed of temperature rising
@@ -321,7 +426,8 @@ plott <- function(data,
         indrt <- as.numeric(colnames(data))
         col <-
                 (grDevices::colorRampPalette(rev(
-                        RColorBrewer::brewer.pal(11,"RdYlBu")
+                        RColorBrewer::brewer.pal(11,
+                                                 "RdYlBu")
                 )))(100)
         if (log) {
                 z <- log10(t(data) + 1)
@@ -330,7 +436,8 @@ plott <- function(data,
         }
         graphics::par(
                 mar = c(2, 5, 1, 4),
-                fig = c(0, 1,0.9, 1),
+                fig = c(0, 1, 0.9,
+                        1),
                 new = F
         )
         # get the mz and rt range and rotate the matrix to
@@ -377,7 +484,8 @@ plott <- function(data,
                                                            1))
         for (i in seq(poly)) {
                 graphics::polygon(
-                        c(bks[i], bks[i + 1], bks[i + 1], bks[i]),
+                        c(bks[i], bks[i + 1], bks[i +
+                                                          1], bks[i]),
                         c(0, 0, 1, 1),
                         col = col[i],
                         border = NA
@@ -386,8 +494,8 @@ plott <- function(data,
         # show the heatmap
         graphics::par(
                 mar = c(4, 5, 0, 4),
-                fig = c(0, 1,
-                        0, 0.9),
+                fig = c(0, 1, 0,
+                        0.9),
                 new = T
         )
         graphics::image(
@@ -401,15 +509,16 @@ plott <- function(data,
         )
         # display the temperature as x
         rtx <- seq(0, 1, length.out = length(indrt))
-        temp <-
-                round(seq(temp[1], temp[2], length.out = length(indrt)),
+        temp <- round(seq(temp[1], temp[2], length.out = length(indrt)),
                       0)
-        graphics::axis(1, at = rtx[temp %% 20 == 0], labels = temp[temp %% 20 == 0])
+        graphics::axis(1, at = rtx[temp %% 20 == 0], labels = temp[temp %% 20 ==
+                                                                           0])
         # display the m/z as y
         mzy <- seq(0, 1, length.out = length(indmz))
         graphics::axis(2,
                        at = mzy[indmz %% 100 == 0],
-                       labels = indmz[indmz %% 100 == 0],
+                       labels = indmz[indmz %% 100 ==
+                                              0],
                        las = 2)
 }
 
@@ -473,10 +582,7 @@ plotrtms <- function(data, rt, ms) {
 #' plotmsrt(matrix,rt = c(500,1000),ms = 300)
 #' }
 #' @export
-plotmsrt <- function(data,
-                     ms,
-                     rt,
-                     n = F) {
+plotmsrt <- function(data, ms, rt, n = F) {
         data <- getmd(data, rt, c(ms, ms + 1))[1,]
         if (n) {
                 data <- ma(data, n)
@@ -499,8 +605,6 @@ plotmsrt <- function(data,
 
 #' Plot Total Ion Chromatogram (TIC)
 #' @param data imported data matrix of GC-MS
-#' @param ms vector range of the m/z
-#' @param rt vector range of the retention time
 #' @param n logical smooth or not
 #' @return plot
 #' @examples
@@ -509,12 +613,7 @@ plotmsrt <- function(data,
 #' plottic(matrix)
 #' }
 #' @export
-plottic <- function(data,
-                    rt = c(3.1, 25),
-                    ms = c(100,
-                           1000),
-                    n = F) {
-        data <- getmd(data, rt, ms)
+plottic <- function(data, n = F) {
         data <- apply(data, 2, sum)
         if (n) {
                 data <- ma(data, n)
@@ -565,13 +664,12 @@ plotint <- function(list, name = NULL) {
                 "l",
                 ylim = c(-0.02 * max(signal),
                          1.02 * max(signal)),
-                main = paste(name,
-                             "Peak")
+                main = paste(name, "Peak")
         )
-        graphics::lines(c(rtstart, rtend), c(sigstart,
-                                             sigend), "l", col = "red")
-        graphics::lines(c(RTrange[scanstart - baseline +
-                                          1], rtstart), c(sigstart, sigstart), "l", col = "darkgreen")
+        graphics::lines(c(rtstart, rtend), c(sigstart, sigend),
+                        "l", col = "red")
+        graphics::lines(c(RTrange[scanstart - baseline + 1],
+                          rtstart), c(sigstart, sigstart), "l", col = "darkgreen")
         graphics::lines(c(rtend, RTrange[scanend + baseline -
                                                  1]), c(sigend, sigend), "l", col = "darkgreen")
         graphics::lines(c(rtstart, rtstart),
@@ -579,8 +677,8 @@ plotint <- function(list, name = NULL) {
                           sigstart * 1.2),
                         "l",
                         col = "blue")
-        graphics::lines(c(rtend, rtend), c(0.8 * sigend,
-                                           sigend * 1.2), "l", col = "blue")
+        graphics::lines(c(rtend, rtend), c(0.8 * sigend, sigend *
+                                                   1.2), "l", col = "blue")
         graphics::lines(c(rtpeak, rtpeak), c(sigpeak, sigpeakbase),
                         "l", col = "blue")
 
@@ -660,15 +758,16 @@ plotintslope <- function(list, name = NULL) {
 #' @export
 findline <- function(data,
                      threshold = 2,
-                     temp = c(100, 320)) {
+                     temp = c(100,
+                              320)) {
         y0 <- as.numeric(rownames(data))
         x <- as.numeric(colnames(data))
         # get the group
         group <- ifelse(log10(data) > threshold, 1, 0)
         # get the difference matrix
         diffmatrix <- apply(group, 2, diff)
-        # get the points with the smallest differences at
-        # the smallest m/z
+        # get the points with the smallest differences at the
+        # smallest m/z
         difftemp <- apply(diffmatrix, 2, which.min)
         y <- y0[difftemp]
         data <- data.frame(y, x)
@@ -706,13 +805,11 @@ findline <- function(data,
         graphics::lines(stats::lowess(data$y ~ data$x),
                         col = "blue",
                         lwd = 5)
-        slope <- (max(temp) - min(temp)) / (max(data$x) -
-                                                    min(data$x))
+        slope <- (max(temp) - min(temp)) / (max(data$x) - min(data$x))
         intercept <- min(temp)
         data$x0 <- slope * (data$x - min(data$x)) + intercept
         fit <- stats::lm(data$y ~ data$x0)
-        rmse <- round(sqrt(mean(stats::resid(fit) ^ 2)),
-                      2)
+        rmse <- round(sqrt(mean(stats::resid(fit) ^ 2)), 2)
         coefs <- stats::coef(fit)
         b0 <- round(coefs[1], 2)
         b1 <- round(coefs[2], 2)
@@ -729,7 +826,8 @@ findline <- function(data,
                        eqn)
         graphics::text(
                 posx,
-                posy - (rangemz[2] - rangemz[1]) * 0.05,
+                posy - (rangemz[2] - rangemz[1]) *
+                        0.05,
                 adj = c(0, 0),
                 cex = 1,
                 eqn2
@@ -796,10 +894,8 @@ plotgroup <- function(data, threshold = 2) {
         # display the RT as x
         rtx <- seq(0, 1, length.out = length(indrt))
         graphics::axis(1,
-                       at = c(0, rtx[indrt %% 300 == 0],
-                              1),
-                       labels = c("", indrt[indrt %% 300 == 0],
-                                  ""))
+                       at = c(0, rtx[indrt %% 300 == 0], 1),
+                       labels = c("", indrt[indrt %% 300 == 0], ""))
         # display the m/z as y
         mzy <- seq(0, 1, length.out = length(indmz))
         graphics::axis(2,
@@ -865,8 +961,8 @@ plotsms <- function(meanmatrix, rsdmatrix) {
         )
         graphics::par(
                 mar = c(0, 4.2, 1, 1.5),
-                oma = c(0,
-                        0, 0, 0),
+                oma = c(0, 0,
+                        0, 0),
                 fig = c(0, 1, 0.8, 1),
                 new = T,
                 cex.axis = 1.5,
@@ -916,13 +1012,310 @@ plothist <- function(data) {
                         lwd = 2)
         graphics::legend(
                 "topright",
-                c("noise", "signal",
-                  "density"),
+                c("noise", "signal", "density"),
                 box.lty = 0,
                 pch = c(-1,-1,-1),
-                lty = c(1, 1, 2),
+                lty = c(1, 1,
+                        2),
                 lwd = c(2, 2, 2),
-                col = c("red",
-                        "green", "black")
+                col = c("red", "green",
+                        "black")
+        )
+}
+
+#' Get the peak list with blank samples' peaks removed
+#' @param xset the xcmsset object with blank and certain group samples' data
+#' @param method parameter for groupval function
+#' @param intensity parameter for groupval function
+#' @param file file name for further annotation, default NULL
+#' @param rsdcf rsd cutoff for peaks, default 30
+#' @param inscf intensity cutoff for peaks, default 1000
+#' @return diff report
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file("cdf", package = "faahKO")
+#' xset <- getdata(cdfpath, pmethod = ' ')
+#' getbgremove(xset)
+#' }
+#' @export
+getbgremove <-
+        function(xset,
+                 method = "medret",
+                 intensity = "into",
+                 file = NULL,
+                 rsdcf = 30,
+                 inscf = 1000) {
+                .Deprecated("getdoe")
+                message("This function has been deprecated and you could use getdoe to remove background.")
+        }
+
+#' Get the report for biological replicates.
+#' @param xset the xcmsset object which for all of your technique replicates for bio replicated sample in single group
+#' @param method parameter for groupval function
+#' @param intensity parameter for groupval function
+#' @param file file name for further annotation, default NULL
+#' @param rsdcf rsd cutoff for peaks, default 30
+#' @param inscf intensity cutoff for peaks, default 0
+#' @return dataframe with mean, standard deviation and RSD for those technique replicates & biological replicates combined with raw data
+#' @export
+getbiotechrep <-
+        function(xset,
+                 method = "medret",
+                 intensity = "into",
+                 file = NULL,
+                 rsdcf = 30,
+                 inscf = 1000) {
+                .Deprecated("getdoe")
+                message("This function has been deprecated and you could use getdoe to process data.")
+        }
+
+#' Get the report for samples with biological and technique replicates in different groups
+#' @param xset the xcmsset object all of samples with technique replicates
+#' @param method parameter for groupval function
+#' @param intensity parameter for groupval function
+#' @param file file name for the peaklist to MetaboAnalyst
+#' @param rsdcf rsd cutoff for peaks, default 30
+#' @param inscf intensity cutoff for peaks, default 1000
+#' @return dataframe with mean, standard deviation and RSD for those technique replicates & biological replicates combined with raw data in different groups if file are defaults NULL.
+#' @export
+getgrouprep <-
+        function(xset,
+                 file = NULL,
+                 method = "medret",
+                 intensity = "into",
+                 rsdcf = 30,
+                 inscf = 1000) {
+                .Deprecated("getdoe")
+                message("This function has been deprecated and you could use getdoe to process data.")
+        }
+
+#' output the similarity of two dataset
+#' @param xset1 the first dataset
+#' @param xset2 the second dateset
+#' @return similarity on retention time and rsd %
+#' @export
+getsim <- function(xset1, xset2) {
+        .Deprecated()
+        message("This function has been deprecated.")
+}
+
+#' Get the report for technique replicates.
+#' @param xset the xcmsset object which for all of your technique replicates for one sample
+#' @param method parameter for groupval function
+#' @param intensity parameter for groupval function
+#' @param file file name for further annotation, default NULL
+#' @param rsdcf rsd cutoff for peaks, default 30
+#' @param inscf intensity cutoff for peaks, default 1000
+#' @return dataframe with mean, standard deviation and RSD for those technique replicates combined with raw data
+#' @export
+gettechrep <-
+        function(xset,
+                 method = "medret",
+                 intensity = "into",
+                 file = NULL,
+                 rsdcf = 30,
+                 inscf = 1000) {
+                .Deprecated("getdoe")
+                message("This function has been deprecated and you could use getdoe to process data.")
+        }
+
+#' Get the time series or two factor DoE report for samples with biological and technique replicates in different groups
+#' @param xset the xcmsset object all of samples with technique replicates in time series or two factor DoE
+#' @param method parameter for groupval function
+#' @param intensity parameter for groupval function
+#' @param file file name for the peaklist to MetaboAnalyst
+#' @param rsdcf rsd cutoff for peaks, default 30
+#' @param inscf intensity cutoff for peaks, default 1000
+#' @return dataframe with time series or two factor DoE mean, standard deviation and RSD for those technique replicates & biological replicates combined with raw data in different groups if file are defaults NULL.
+#' @export
+gettimegrouprep <-
+        function(xset,
+                 file = NULL,
+                 method = "medret",
+                 intensity = "into",
+                 rsdcf = 30,
+                 inscf = 1000) {
+                .Deprecated("getdoe")
+                message("This function has been deprecated and you could use getdoe to process data.")
+        }
+
+#' Plot the influnces of DoE and Batch effects on each peaks
+#' @param df data output from `svacor` function
+#' @param dfsv data output from `svaplot` function for corrected data
+#' @param dfanova data output from `svaplot` function for raw data
+#' @return influnces plot
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
+#' xset <- xcmsSet(cdffiles)
+#' xset <- group(xset)
+#' xset2 <- retcor(xset, family = "symmetric", plottype = "mdevden")
+#' xset2 <- group(xset2, bw = 10)
+#' xset3 <- fillPeaks(xset2)
+#' df <- svacor(xset3)
+#' dfsv <- svaplot(xset3)
+#' dfanova <- svaplot(xset3, pqvalues = "anova")
+#' svabatch(df,dfsv,dfanova)
+#' }
+#' @seealso \code{\link{svacor}}, \code{\link{svaplot}}, \code{\link{svapca}}
+#' @export
+svabatch <- function(df, dfsv, dfanova) {
+        .Deprecated()
+        message(
+                "This function has been deprecated and you could use mzrtsim package for batch effect correction."
+        )
+}
+
+#' Surrogate variable analysis(SVA) to correct the unknown batch effects
+#' @param xset xcmsset object
+#' @param lv group information
+#' @param method parameter for groupval function
+#' @param intensity parameter for groupval function
+#' @details this is used for reviesed version of SVA to correct the unknown batch effects
+#' @return list object with various components such raw data, corrected data, signal part, random errors part, batch part, p-values, q-values, mass, rt, Posterior Probabilities of Surrogate variables and Posterior Probabilities of Mod. If no surrogate variable found, corresponding part would miss.
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
+#' xset <- xcmsSet(cdffiles)
+#' xset <- group(xset)
+#' xset2 <- retcor(xset, family = "symmetric", plottype = "mdevden")
+#' xset2 <- group(xset2, bw = 10)
+#' xset3 <- fillPeaks(xset2)
+#' df <- svacor(xset3)
+#' }
+#' @seealso \code{\link{svapca}}, \code{\link{svaplot}}, \code{\link{svabatch}}
+#' @export
+svacor <- function(xset,
+                   lv = NULL,
+                   method = "medret",
+                   intensity = "into") {
+        .Deprecated()
+        message(
+                "This function has been deprecated and you could use mzrtsim package for batch effect correction."
+        )
+}
+
+#' Filter the data with p value and q value
+#' @param list results from svacor function
+#' @param pqvalues method for ANOVA or SVA
+#' @param pt threshold for p value, default is 0.05
+#' @param qt threshold for q value, default is 0.05
+#' @return data, corrected data, mz and retention for fileted data
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
+#' xset <- xcmsSet(cdffiles)
+#' xset <- group(xset)
+#' xset2 <- retcor(xset, family = "symmetric", plottype = "mdevden")
+#' xset2 <- group(xset2, bw = 10)
+#' xset3 <- fillPeaks(xset2)
+#' df <- svacor(xset3)
+#' svadata(df)
+#' }
+#' @export
+svadata <- function(list,
+                    pqvalues = "sv",
+                    pt = 0.05,
+                    qt = 0.05) {
+        .Deprecated()
+        message(
+                "This function has been deprecated and you could use mzrtsim package for batch effect correction."
+        )
+}
+
+#' Principal component analysis(PCA) for SVA corrected data and raw data
+#' @param list results from svacor function
+#' @param center parameters for PCA
+#' @param scale parameters for scale
+#' @param lv group information
+#' @return plot
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
+#' xset <- xcmsSet(cdffiles)
+#' xset <- group(xset)
+#' xset2 <- retcor(xset, family = "symmetric", plottype = "mdevden")
+#' xset2 <- group(xset2, bw = 10)
+#' xset3 <- fillPeaks(xset2)
+#' df <- svacor(xset3)
+#' svapca(df)
+#' }
+#' @seealso \code{\link{svacor}}, \code{\link{svaplot}}, \code{\link{svabatch}}
+#' @export
+svapca <- function(list,
+                   center = T,
+                   scale = T,
+                   lv = NULL) {
+        .Deprecated()
+        message(
+                "This function has been deprecated and you could use mzrtsim package for batch effect correction."
+        )
+}
+
+#' Filter the data with p value and q value and show them
+#' @param list results from svacor function
+#' @param pqvalues method for ANOVA or SVA
+#' @param pt threshold for p value, default is 0.05
+#' @param qt threshold for q value, default is 0.05
+#' @param lv group information
+#' @param index index for selected peaks
+#' @return heatmap for the data
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
+#' xset <- xcmsSet(cdffiles)
+#' xset <- group(xset)
+#' xset2 <- retcor(xset, family = "symmetric", plottype = "mdevden")
+#' xset2 <- group(xset2, bw = 10)
+#' xset3 <- fillPeaks(xset2)
+#' df <- svacor(xset3)
+#' svaplot(df)
+#' }
+#' @seealso \code{\link{svacor}}, \code{\link{svapca}}, \code{\link{svabatch}}
+#' @export
+svaplot <- function(list,
+                    pqvalues = "sv",
+                    pt = 0.05,
+                    qt = 0.05,
+                    lv = NULL,
+                    index = NULL) {
+        .Deprecated()
+        message(
+                "This function has been deprecated and you could use mzrtsim package for batch effect correction."
+        )
+}
+
+#' Get the corrected data after SVA for metabolanalyst
+#' @param xset xcmsset object
+#' @param lv group information
+#' @return csv files for both raw and corrected data for metabolanalyst if SVA could be applied
+#' @examples
+#' \dontrun{
+#' library(faahKO)
+#' cdfpath <- system.file("cdf", package = "faahKO")
+#' cdffiles <- list.files(cdfpath, recursive = TRUE, full.names = TRUE)
+#' xset <- xcmsSet(cdffiles)
+#' xset <- group(xset)
+#' xset2 <- retcor(xset, family = "symmetric", plottype = "mdevden")
+#' xset2 <- group(xset2, bw = 10)
+#' xset3 <- fillPeaks(xset2)
+#' svaupload(xset3)
+#' }
+#' @export
+svaupload <- function(xset, lv = NULL) {
+        .Deprecated()
+        message(
+                "This function has been deprecated and you could use mzrtsim package for batch effect correction."
         )
 }
