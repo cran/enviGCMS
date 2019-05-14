@@ -28,13 +28,13 @@ When you perform a selected ions monitor(SIM) mode analysis, only few mass data 
 You could use `getmd` to import the mass spectrum data as supported by `xcms` and get the profile of GC-MS data matrix. `mzstep` is the bin step for mass:
 
 ```
-data <- getmd('data/data1.CDF', mzstep = 0.1)
+data <- enviGCMS:::getmd('data/data1.CDF', mzstep = 0.1)
 ```
 
 You could also subset the data by the mass(m/z 100-1000) or retention time range(40-100s) in `getmd` function:
 
 ```
-data <- getmd(data,mzrange=c(100,1000),rtrange=c(40,100))
+data <- enviGCMS:::getmd(data,mzrange=c(100,1000),rtrange=c(40,100))
 ```
 
 You could also combined the mass full-scan data with the same range of retention time by `cbmd`:
@@ -100,25 +100,21 @@ In environmetnal non-target analysis, when multiple samples are collected, probl
 
 - `getdata2` could be used to get the `XCMSnExp` object in one step with optimized methods 
 
-- `getupload` could get the csv files to be submitted to Metaboanalyst from `xcmsSet` object
+- `getmzrt` could get a list as `mzrt` object with peaks list, mz, retention time and class of samples from `xcmsSet`/`XCMSnExp` object. You could also save related `xcmsSet` and `xcmsEIC` object for further analysis. It also support to output the file for metaboanalyst, xMSannotator, Mummichog pathway analysis and paired mass distance(PMD) analysis.
 
-- `getupload2` could get the csv files to be submitted to Metaboanalyst from `XCMSnExp` object
-
-- `getmzrt` could get a list or csv files with peaks list, mz, retention time and class of samples from `xcmsSet` object
-
-- `getmzrt2` could get a list or csv files with peaks list, mz, retention time and class of samples from `XCMSnExp` object
-
-- `getmzrtcsv` could read in the csv files and return a list for peaks list
+- `getmzrtcsv` could read in the csv files and return a list for peaks list as `mzrt` object
 
 ### Data imputation and filtering
 
-- `getimputation` could impute NA in the peaks list
+- `getimputation` could impute NA in the peaks list.
 
-- `getdoe` could filter the data based on DoE, rsd, intensity
+- `getfilter` could filter the data based on row and colomn index.
 
-- `getfeaturest` could get the features from t test, with p value, q value, rsd and power restriction
+- `getdoe` could filter the data based on rsd and intensity and generate group mean, standard deviation, and group rsd.
 
-- `getfeaturesanova` could get the features from anova, with p value, q value, rsd and power restriction
+- `getpower` could compute the power for known peaks list or the sample numbers for each peak
+
+- `getoverlappeak` could get the overlap peaks by mass and retention time range for two different list objects
 
 ### Visulation of peaks list data
 
@@ -126,11 +122,19 @@ In environmetnal non-target analysis, when multiple samples are collected, probl
 
 - `plotmrc` could plot the differences as scatter plot for peaks list with threshold between two group of data
 
-- `plote` could plot EIC and boxplot for all peaks and return diffreport
-
 - `plotrsd` could plot the rsd influnces of data in different groups
 
 - `gifmr` could plot scatter plot for peaks list and output gif file for mutiple groups
+
+- `plotpca` could plot pca score plot
+
+- `plothm` could plot heapmap
+
+- `plotden` could plot density of multiple samples
+
+- `plotrla` could plot Relative Log Abundance (RLA) plots
+
+- `plotridges` could plot Relative Log Abundance Ridge (RLAR) plots
 
 ## Summary
 

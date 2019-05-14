@@ -1,3 +1,40 @@
+# enviGCMS 0.5.5
+
+- CRAN
+
+# enviGCMS 0.5.4
+
+## Major changes
+
+- move dependances of xcms and MSnbase to suggest and remove the export for those functions
+- introduce parallel computation in getdoe
+- add demo data and organize examples
+- add Relative Log Abundance (RLA) plots and Relative Log Abundance Ridge(RLA) plots
+- add getcsv to save the list as csv file
+- add getfilter to filter the list
+- add getpower to deal with power analysis in metabolomics
+- rewrite getmzrt and getdoe to make analysis easier
+- deprecated getupload, getfeaturest and getfeaturesanova
+- update vignettes
+- add support for group dim larger than 2
+
+# enviGCMS 0.5.2
+
+## Major changes
+
+- combine xcms and xcms 3 object function
+- add support for single group plot
+- add shiny application for mass defect analysis
+- add function to compute high order mass defect
+- add function to compare two peak list by overlap
+- add function to output csv file from list object
+- add function to perform pmd analysis
+- add function to get chemical formula
+- fix wrong object name in getmzrt/getmzrt2
+- add options to export EIC object
+- add function to screen organohalogen compounds
+- add density plot for multiple samples
+
 # enviGCMS 0.5.0
 
 - CRAN
@@ -88,7 +125,3 @@
 - Add getdoe and remove former DoE related function
 - Change the plot function from xcmsset based to list based
 - Add support for xcms 3 function
-
-## Tips
-
-- Former related functions could be found in xsetplus package here: https://github.com/yufree/xsetplus
