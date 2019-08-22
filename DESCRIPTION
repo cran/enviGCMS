@@ -1,8 +1,8 @@
 Package: enviGCMS
 Type: Package
 Title: GC/LC-MS Data Analysis for Environmental Science
-Version: 0.5.5
-Date: 2019-05-14
+Version: 0.5.7
+Date: 2019-08-21
 Authors@R: c(person(given = "Miao", family = "YU",
         role = c("aut", "cre"), 
         email = "yufreecas@gmail.com",
@@ -28,8 +28,8 @@ Imports: rcdk, RColorBrewer, mixtools, BiocParallel, genefilter,
         ggraph, ggplot2, ggridges
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-05-14 15:46:08 UTC; yum14
+Packaged: 2019-08-21 18:43:38 UTC; yum14
 Author: Miao YU [aut, cre] (<https://orcid.org/0000-0002-2804-6014>),
   Thanh Wang [ctb] (<https://orcid.org/0000-0002-5729-1908>)
 Repository: CRAN
-Date/Publication: 2019-05-14 16:10:03 UTC
+Date/Publication: 2019-08-22 04:30:02 UTC

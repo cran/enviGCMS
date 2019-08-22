@@ -406,8 +406,10 @@ plotrsd <- function(list,
 #' @param ... parameters for `plot` function
 #' @return gif file
 #' @examples
+#' \dontrun{
 #' data(list)
 #' gifmr(list)
+#' }
 #' @export
 gifmr <- function(list,
                   ms = c(100, 500),
@@ -471,7 +473,7 @@ gifmr <- function(list,
 #' @return if xrange and yrange are not NULL, return file name of all selected samples on 2D score plot
 #' @examples
 #' data(list)
-#' plotpca(list$data, lv = as.character(list$group$class))
+#' plotpca(list$data, lv = as.character(list$group))
 #' @export
 plotpca <- function(data,
                     lv = NULL,
@@ -537,7 +539,7 @@ plotpca <- function(data,
 #' @return NULL
 #' @examples
 #' data(list)
-#' plothm(list$data, lv = list$group$class)
+#' plothm(list$data, lv = as.factor(list$group))
 #' @export
 plothm <- function(data, lv, index = NULL) {
         icolors <-
@@ -638,16 +640,18 @@ plothm <- function(data, lv, index = NULL) {
 #' @param lv group information
 #' @param index index for selected peaks
 #' @param name name on the figure for samples
+#' @param lwd the line width for density plot, default 1
 #' @param ... parameters for `plot` function
 #' @return NULL
 #' @examples
 #' data(list)
-#' plotden(list$data, lv = as.character(list$group$class))
+#' plotden(list$data, lv = as.character(list$group),ylim = c(0,1))
 #' @export
 plotden <- function(data,
                     lv,
                     index = NULL,
                     name = NULL,
+                    lwd = 1,
                     ...) {
         if (!is.null(index)) {
                 data <- data[index,]
@@ -664,19 +668,18 @@ plotden <- function(data,
                 1,
                 1,
                 typ = 'n',
-                main = paste0('Metabolites profiles changes in',
+                main = paste0('Metabolites profiles changes in ',
                               name,
                               ' samples'),
                 xlab = 'Intensity(log based 10)',
                 ylab = 'Density',
                 xlim = c(xlim[1], xlim[2] + 1),
-                ylim = c(0, 1),
                 ...
         )
         for (i in 1:(ncol(data))) {
                 graphics::lines(stats::density(log10(data[, i] + 1)),
                                 col = col[i],
-                                lwd = 3)
+                                lwd = lwd)
         }
         graphics::legend(
                 "topright",
@@ -693,7 +696,7 @@ plotden <- function(data,
 #' @return Relative Log Abundance (RLA) plots
 #' @examples
 #' data(list)
-#' plotrla(list$data, as.factor(list$group$class))
+#' plotrla(list$data, as.factor(list$group))
 #' @export
 plotrla <- function(data, lv, type = "g") {
         data <- log(data)
@@ -724,7 +727,7 @@ plotrla <- function(data, lv, type = "g") {
 #' @return Relative Log Abundance Ridge(RLA) plots
 #' @examples
 #' data(list)
-#' plotridges(list$data, as.factor(list$group$class))
+#' plotridges(list$data, as.factor(list$group))
 #' @export
 plotridges <- function(data, lv, type = "g") {
         data <- log(data)

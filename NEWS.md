@@ -1,3 +1,15 @@
+# enviGCMS 0.5.7
+
+- CRAN
+
+# enviGCMS 0.5.6
+
+- fix group issue in mzrt object
+- all the group info will be imported as character while user could change the character into dataframe
+- export getmzrtcsv 
+- add findmet to export metabolites for certain compounds based on mass defect
+- add demo data for TBBPA metabolites from this [publication](https://doi.org/10.1021/acs.est.9b02122)
+
 # enviGCMS 0.5.5
 
 - CRAN

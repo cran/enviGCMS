@@ -33,16 +33,15 @@ getmr <-
 
 #' Covert the peaks list csv file into list
 #' @param path the path to your csv file
-#' @return list with rtmz profile and group infomation
+#' @return list with rtmz profile and group infomation as the first row
 #' @seealso \code{\link{getmzrt}}
+#' @export
 getmzrtcsv <- function(path) {
         dataraw <- utils::read.csv(path, skip = 1)
         mz <- dataraw[, 2]
         rt <- dataraw[, 3]
         data <- dataraw[,-c(1:3)]
-        group <- data.frame(t(utils::read.csv(path, nrows = 1)[-(1:3)]))
-        colnames(group) <- c(1:ncol(group))
-        colnames(data) <- rownames(group)
+        group <- c(t(utils::read.csv(path, nrows = 1)[-(1:3)]))
         rownames(data) <- dataraw[, 1]
         re <- list(
                 data = data,
@@ -58,9 +57,11 @@ getmzrtcsv <- function(path) {
 #' @param outfilename the name of the MSP file, default is 'unknown'
 #' @return none a MSP file will be created at the subfolder working dictionary with name 'MSP'
 #' @examples
+#' \dontrun{
 #' mz <- c(10000,20000,10000,30000,5000)
 #' names(mz) <- c(101,143,189,221,234)
 #' writeMSP(mz,'test')
+#' }
 #' @export
 writeMSP <- function(mz, outfilename = "unknown") {
         mz <- paste(names(mz), round(mz))

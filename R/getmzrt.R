@@ -86,8 +86,10 @@
 #' @references Li, S.; Park, Y.; Duraisingham, S.; Strobel, F. H.; Khan, N.; Soltow, Q. A.; Jones, D. P.; Pulendran, B. PLOS Computational Biology 2013, 9 (7), e1003123.
 #' Xia, J., Sinelnikov, I.V., Han, B., Wishart, D.S., 2015. MetaboAnalyst 3.0—making metabolomics more meaningful. Nucl. Acids Res. 43, W251–W257.
 #' @examples
+#' \dontrun{
 #' data(list)
 #' getcsv(list,name='demo')
+#' }
 #' @export
 getcsv <-
         function(list,
@@ -345,7 +347,7 @@ getfilter <-
                         colindex <- list$colindex
                 }
                 list$data <- list$data[, colindex]
-                if(dim(list$group)[2]>1) {
+                if(NCOL(list$group)>1) {
                         list$group <- list$group[colindex,]
                 }else{
                         list$group <- list$group[colindex]
@@ -496,14 +498,14 @@ getpower <-
                  qt = 0.05,
                  powert = 0.8,
                  imputation = "l") {
-                group <- list$group$class
+                group <- as.factor(list$group)
                 g <- unique(group)
                 ng <- length(g)
                 n <- min(table(group))
                 list <- getdoe(list, imputation = imputation)
                 sd <- apply(list$groupmean, 1, mean)
                 if (ng == 2) {
-                        ar <- genefilter::rowttests(list$data, fac = list$group$class)
+                        ar <- genefilter::rowttests(list$data, fac = group)
                         dm <- ar$dm
                         m <- nrow(list$data)
                         p <- ar$p.value
@@ -536,7 +538,7 @@ getpower <-
                 } else{
                         sdg <- genefilter::rowSds(list$groupmean)
                         ar <-
-                                genefilter::rowFtests(list$data, list$group$class)
+                                genefilter::rowFtests(list$data, group)
                         p <- ar$p.value
                         q <- stats::p.adjust(p, method = "BH")
                         m <- nrow(list$data)
