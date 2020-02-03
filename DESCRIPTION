@@ -1,8 +1,8 @@
 Package: enviGCMS
 Type: Package
 Title: GC/LC-MS Data Analysis for Environmental Science
-Version: 0.5.7
-Date: 2019-08-21
+Version: 0.6.0
+Date: 2020-02-03
 Authors@R: c(person(given = "Miao", family = "YU",
         role = c("aut", "cre"), 
         email = "yufreecas@gmail.com",
@@ -21,15 +21,15 @@ Suggests: knitr, testthat, xcms, MSnbase
 VignetteBuilder: knitr
 biocViews:
 Depends: R (>= 2.10)
-Imports: rcdk, RColorBrewer, mixtools, BiocParallel, genefilter,
+Imports: Rdisop, RColorBrewer, mixtools, BiocParallel, genefilter,
         grDevices, graphics, stats, utils, methods, reshape2, animation
         (>= 2.2.3), data.table, rmarkdown, shiny, shinythemes, DT,
-        crosstalk, dplyr, plotly, broom, itertools, iterators, igraph,
-        ggraph, ggplot2, ggridges
-RoxygenNote: 6.1.1
+        crosstalk, dplyr, plotly, broom, igraph, ggraph, ggplot2,
+        ggridges
+RoxygenNote: 7.0.2
 NeedsCompilation: no
-Packaged: 2019-08-21 18:43:38 UTC; yum14
+Packaged: 2020-02-03 21:50:12 UTC; yum14
 Author: Miao YU [aut, cre] (<https://orcid.org/0000-0002-2804-6014>),
   Thanh Wang [ctb] (<https://orcid.org/0000-0002-5729-1908>)
 Repository: CRAN
-Date/Publication: 2019-08-22 04:30:02 UTC
+Date/Publication: 2020-02-03 22:30:02 UTC

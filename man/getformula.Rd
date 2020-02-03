@@ -4,13 +4,18 @@
 \alias{getformula}
 \title{Get chemical formula for mass to charge ratio.}
 \usage{
-getformula(mz, charge = 1, window = 0.001, elements = list(C = c(1,
-  50), H = c(1, 50), N = c(0, 50), O = c(0, 50), P = c(0, 1), S = c(0, 1)))
+getformula(
+  mz,
+  charge = 0,
+  window = 0.001,
+  elements = list(C = c(1, 50), H = c(1, 50), N = c(0, 50), O = c(0, 50), P = c(0, 1), S
+    = c(0, 1))
+)
 }
 \arguments{
 \item{mz}{a vector with mass to charge ratio}
 
-\item{charge}{The charge value of the formula.}
+\item{charge}{The charge value of the formula, default 0 for autodetect}
 
 \item{window}{The window accuracy in the same units as mass}
 

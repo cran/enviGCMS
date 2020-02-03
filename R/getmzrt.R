@@ -8,8 +8,8 @@
                  mzdigit = 4,
                  rtdigit = 1)
         {
-                data <- xcms::featureValues(XCMSnExp, value = value)
-                group <- as.character(XCMSnExp@phenoData@data)
+                data <- xcms::featureValues(XCMSnExp, value = value, missing = 0)
+                group <- data.frame(apply(XCMSnExp@phenoData@data, 2, as.character),stringsAsFactors = F)
 
                 # peaks info
                 peaks <- xcms::featureDefinitions(XCMSnExp)
@@ -391,7 +391,7 @@ getdoe <- function(list,
                 meant <- meant[idx,]
                 sdt <- BiocParallel::bpaggregate(t(data), list(mlv), stats::sd,BPPARAM = BPPARAM)
                 idx <- match(unique(mlv), sdt[,1])
-                sdt <- sdt[,idx]
+                sdt <- sdt[idx,]
                 suppressWarnings(rsd <- sdt[,-1] / meant[,-1] *
                                          100)
                 data <- t(meant[,-1])
@@ -628,4 +628,40 @@ getoverlaprt <- function(rtrange1, rtrange2) {
 
         index <- (!is.na(overlapms))
         return(index)
+}
+#' Density weighted intensity for one sample
+#' @param peak peaks intensity one sample
+#' @param n the number of equally spaced points at which the density is to be estimated, default 512
+#' @param log log transformation
+#' @return Density weighted intensity for one sample
+#' @examples
+#' data(list)
+#' getdwtus(list$data[,1])
+#' @export
+#'
+getdwtus <- function(peak,n=512,log=F){
+        if(log){
+                peak <- log(peak+1)
+        }
+        sum <- sum(stats::density(peak,bw='sj',n=n)$x*stats::density(peak,bw='sj',n=n)$y)
+        return(sum)
+}
+
+#' Compute pooled QC linear index according to run order
+#' @param data peaks intensity list with row as peaks and column as samples
+#' @param order run order of pooled QC samples
+#' @param n samples numbers used for linear regression
+#' @return vector for the peaks proportion with significant changes in linear regression after FDR control.
+#' @export
+
+getpqsi <- function(data, order, n=5){
+        data <- data[,order(order)]
+        porp <- 1:ncol(data)
+        for(i in n:ncol(data)){
+                p <- apply(data[,c((i-n+1):i)],1,function(x) summary(stats::lm(x~c((i-n+1):i)))$coefficients[2,4])
+                # FDR control
+                q <- stats::p.adjust(p,method='BH')
+                porp[i] <- sum(q<0.1)/nrow(data)
+        }
+        return(porp[-c(1:(n-1))])
 }

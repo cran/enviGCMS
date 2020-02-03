@@ -1,3 +1,18 @@
+# enviGCMS 0.6.0
+
+- remove dependency of rcdk package 
+- CRAN
+
+# enviGCMS 0.5.9
+
+- fix `...` issue
+
+# enviGCMS 0.5.8
+
+- add functions to get and plot density weighted intensity
+- add pooled QC vignette
+- add plotcc to plot calibration curve
+
 # enviGCMS 0.5.7
 
 - CRAN
