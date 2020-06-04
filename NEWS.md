@@ -1,3 +1,36 @@
+# enviGCMS 0.6.6
+
+- CRAN
+
+# enviGCMS 0.6.5
+
+- change to formal group information for mzrt class
+- fix log infinate issue in plotridge
+- update list data
+
+# enviGCMS 0.6.4
+
+- plotpeak for intensity of peaks across samples or samples across peaks
+- plotridge for ridgeline density plot
+- plotrug for 1-d density for multiple samples
+
+# enviGCMS 0.6.3
+
+- add findlipid to annotate lipid class based on referenced Kendrick mass defect
+
+# enviGCMS 0.6.2
+
+- add getMSP to read in EI-MS or MS/MS msp file as list for annotation
+- add xrankanno and dotpanno function for MS/MS X Rank and dot product annotation
+- add getrangecsv for MS2 mgf file extraction
+
+# enviGCMS 0.6.1
+
+- remove dependency of genefilter
+- remove dependency of reshape2
+- remove dependency of ggplot2
+- remove dependency of ggridges
+
 # enviGCMS 0.6.0
 
 - remove dependency of rcdk package 

@@ -38,10 +38,13 @@ getmr <-
 #' @export
 getmzrtcsv <- function(path) {
         dataraw <- utils::read.csv(path, skip = 1)
+        sample_name <- names(utils::read.csv(path, nrows = 1)[-(1:3)])
         mz <- dataraw[, 2]
         rt <- dataraw[, 3]
         data <- dataraw[,-c(1:3)]
-        group <- c(t(utils::read.csv(path, nrows = 1)[-(1:3)]))
+        colnames(data) <- sample_name
+        sample_group <- c(t(utils::read.csv(path, nrows = 1)[-(1:3)]))
+        group <- cbind.data.frame(sample_name,sample_group,stringsAsFactors = F)
         rownames(data) <- dataraw[, 1]
         re <- list(
                 data = data,
@@ -102,6 +105,54 @@ writeMSP <- function(mz, outfilename = "unknown") {
         )
 }
 
+#' read in MSP file as list for ms/ms or ms(EI) annotation
+#' @param file the path to your MSP file
+#' @return list a list with MSP information for annotation
+#' @export
+getMSP <- function(file){
+        # this part is modified from compMS2Miner's code: https://github.com/WMBEdmands/compMS2Miner/blob/ee20d3d632b11729d6bbb5b5b93cd468b097251d/R/metID.matchSpectralDB.R
+        msp <- readLines(file)
+        # remove empty lines
+        msp <- msp[msp != '']
+        ncomp <- grep('^NAME:', msp, ignore.case = TRUE)
+        splitFactorTmp <- rep(1:length(ncomp), diff(c(ncomp, length(msp) + 1)))
+
+        li <- split(msp,f = splitFactorTmp)
+        getmsp <- function(x){
+                namet <- x[grep('^NAME:',x, ignore.case=TRUE)]
+                name <- gsub('^NAME: ','',namet, ignore.case=TRUE)
+                ionmodet <- x[grep('^ION MODE:|^MODE:|^IONMODE:',x, ignore.case=TRUE)]
+                ionmode <- gsub('^ION MODE: |^MODE: |^IONMODE: ','',ionmodet, ignore.case=TRUE)
+                prect <- x[grep('^PRECURSORMZ: |^PRECURSOR M/Z: |^PRECURSOR MZ: |^PEPMASS: ',x, ignore.case=TRUE)]
+                prec <- as.numeric(gsub('^PRECURSORMZ: |^PRECURSOR M/Z: |^PRECURSOR MZ: |^PEPMASS: ','',prect, ignore.case=TRUE))
+                formt <- x[grep('^FORMULA: ',x, ignore.case=TRUE)]
+                formula <- gsub('^FORMULA: ','',formt,ignore.case = TRUE)
+                npt <- x[grep('^Num Peaks: ',x, ignore.case=TRUE)]
+                np <- gsub('^Num Peaks: ','',npt,ignore.case = TRUE)
+                cet <- x[grep('COLLISIONENERGY: ',x,ignore.case=TRUE)]
+                ce <- gsub('COLLISIONENERGY: ','',cet,ignore.case=TRUE)
+                rtt <- x[grep('RETENTIONINDEX: ',x,ignore.case = TRUE)]
+                rt <- gsub('RETENTIONINDEX: ','',rtt,ignore.case=TRUE)
+                if(as.numeric(np)>0){
+                        # matrix of masses and intensities
+                        massIntIndx <- which(grepl('^[0-9]', x) & !grepl(': ', x))
+                        massesInts <- unlist(strsplit(x[massIntIndx], '\t| '))
+                        massesInts <- as.numeric(massesInts[grep('^[0-9].*[0-9]$|^[0-9]$', massesInts)])
+                        # if any NAs remove from indx
+                        mz <-  massesInts[seq(1, length(massesInts), 2)]
+                        ins <-  massesInts[seq(2, length(massesInts), 2)]
+                        ins <- ins/max(ins)*100
+                        spectra <- cbind.data.frame(mz=mz,ins=ins)
+                        return(list(name=name,ionmode=ionmode,prec=prec,formula=formula,np = np,rti=rt,ce=ce,spectra=spectra))
+                }else{
+                        return(list(name=name,ionmode=ionmode,prec=prec,formula=formula,np = np,rti=rt,ce=ce))
+                }
+
+        }
+        li <- lapply(li,getmsp)
+        return(li)
+}
+
 #' get the data of QC compound for a group of data
 #' @param path data path for your QC samples
 #' @param mzrange mass of the QC compound
@@ -158,3 +209,8 @@ getformula <-
                 }
                 return(list)
         }
+
+
+
+
+

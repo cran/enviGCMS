@@ -8,16 +8,27 @@ knitr::opts_chunk$set(
 library(enviGCMS)
 
 ## -----------------------------------------------------------------------------
-data(list)
-plotden(list$data,list$group,ylim = c(0,1))
+plotpeak(list$data, lv = as.factor(list$group$sample_group))
+
+## -----------------------------------------------------------------------------
+plotpeak(t(list$data))
 
 ## -----------------------------------------------------------------------------
 data(list)
-plotrla(list$data,as.factor(list$group))
+plotden(list$data,list$group$sample_group,ylim = c(0,1))
+# 1-d density for multiple samples
+plotrug(log(list$data), lv = as.factor(list$group$sample_group))
 
 ## -----------------------------------------------------------------------------
 data(list)
-plotridges(list$data, as.factor(list$group))
+plotrla(list$data,as.factor(list$group$sample_group))
+
+## -----------------------------------------------------------------------------
+data(list)
+plotridges(list$data, as.factor(list$group$sample_group))
+# ridgeline density plot
+plotridge(t(list$data),indexy=c(1:10),xlab = 'Intensity',ylab = 'peaks')
+plotridge(log(list$data),as.factor(list$group$sample_group),xlab = 'Intensity',ylab = 'peaks')
 
 ## -----------------------------------------------------------------------------
 data(list)

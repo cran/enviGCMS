@@ -55,9 +55,18 @@
                 mz <- peaks$mzmed
                 rt <- peaks$rtmed
                 if(dim(xcms::phenoData(xcmsSet))[2]>1){
-                        group <- xcms::phenoData(xcmsSet)
+                        if(sum(grepl('sample_name',colnames(xcms::phenoData(xcmsSet))))>0){
+                                group <- xcms::phenoData(xcmsSet)
+                                colnames(data) <- group$sample_name
+                        }else{
+                                sample_name <- rownames(xcms::phenoData(xcmsSet))
+                                sample_group <- xcms::phenoData(xcmsSet)
+                                group <- cbind.data.frame(sample_name,sample_group)
+                        }
                 }else{
-                        group <- as.character(xcms::phenoData(xcmsSet)$class)
+                        sample_name <- rownames(xcms::phenoData(xcmsSet))
+                        sample_group <- as.character(xcms::phenoData(xcmsSet)$class)
+                        group <- cbind.data.frame(sample_name,sample_group)
                 }
 
                 mzrange <- peaks[, c("mzmin", "mzmax")]
@@ -100,7 +109,8 @@ getcsv <-
                  ...) {
                 if (!is.null(name)) {
                         if (grepl('m', type)) {
-                                data <- rbind(list$group, list$data)
+                                sample_group <- list$group[,-1]
+                                data <- rbind(sample_group, list$data)
                                 rownames(data) <-
                                         c("group",
                                           paste0(
@@ -128,16 +138,17 @@ getcsv <-
                                 utils::write.csv(data, file = filename, ...)
                         }
                         if (grepl('p', type)) {
-                                lv <- list$group
+                                lv <- list$group[,-1]
                                 lif <- getimputation(list, method = "l")
-                                fstats <-
-                                        genefilter::rowFtests(as.matrix(lif$data), fac = as.factor(lv))
+                                ar <-
+                                        apply(lif$data,1, function(x) stats::anova(stats::lm(x~lv)))
+
                                 df <-
                                         cbind.data.frame(
                                                 m.z = list$mz,
                                                 rt = list$rt,
-                                                p.value = fstats$p.value,
-                                                t.score = fstats$statistic
+                                                p.value = sapply(ar,function(x) x$`Pr(>F)`[1]),
+                                                t.score = sapply(ar,function(x) x$`F value`[1])
                                         )
                                 filename <- paste0(name, 'mummichog.txt')
                                 utils::write.table(
@@ -153,7 +164,7 @@ getcsv <-
                                               rt = list$rt,
                                               list$data)
                                 colname <- colnames(data)
-                                groupt = c('mz', 'rt', list$group)
+                                groupt = c('mz', 'rt', list$group[,-1])
                                 data <- rbind(groupt, data)
                                 rownames(data) <-
                                         c('group',
@@ -169,6 +180,17 @@ getcsv <-
                         }
                 }
         }
+#' Get a mzrt list and/or save mz and rt range as csv file.
+#' @param list list with data as peaks list, mz, rt and group information
+#' @param name result name for csv and/or eic file, default NULL
+#' @param ... other parameters for `write.table`
+#' @return NULL, csv file
+#' @export
+getrangecsv <- function(list,name,...){
+        df <- cbind.data.frame(list$mzrange,list$rtrange)
+        filename <- paste0(name, "mzrtrange.csv")
+        utils::write.csv(df, file = filename, ...)
+}
 #' Get the mzrt profile and group information as a mzrt list and/or save them as csv or rds for further analysis.
 #' @param xset xcmsSet/XCMSnExp objects
 #' @param name file name for csv and/or eic file, default NULL
@@ -237,7 +259,7 @@ getmzrt <-
                                                 rt = "corrected",
                                                 groupidx = 1:nrow(xset2@groups)
                                         )
-                                saveRDS(eic, file = paste0(name, '.rds'))
+                                saveRDS(eic, file = paste0(name, 'eic.rds'))
                                 saveRDS(xset2, file = paste0(name, 'xset.rds'))
                         }
                         result <-
@@ -356,7 +378,7 @@ getfilter <-
                 getcsv(list, name = name, type = type, ...)
                 return(list)
         }
-#' Filter the data based on DoE, rsd, intensity
+#' Generate the group level rsd and average intensity based on DoE,
 #' @param list list with data as peaks list, mz, rt and group information
 #' @param inscf Log intensity cutoff for peaks across samples. If any peaks show a intensity higher than the cutoff in any samples, this peaks would not be filtered. default 5
 #' @param rsdcf the rsd cutoff of all peaks in all group
@@ -381,7 +403,7 @@ getdoe <- function(list,
         # replicates instead
         if (tr) {
                 data <- list$data
-                lv <- list$group
+                lv <- list$group[,-1,drop=FALSE]
                 # group base on levels
                 cols <- colnames(lv)
                 mlv <- do.call(paste, c(lv[cols]))
@@ -421,9 +443,9 @@ getdoe <- function(list,
                                 i)
                                 ng <- cbind(ng, lvi)
                         }
-                        list$group <- data.frame(ng)
+                        list$group <- cbind.data.frame(sample_name = unique(mlv),ng,stringsAsFactors = F)
                 } else {
-                        list$group <- data.frame(unique(mlv))
+                        list$group <- data.frame(sample_name = unique(mlv),sample_group = unique(mlv),stringsAsFactors = F)
                 }
                 # save the index
                 list$techindex <- indext
@@ -431,7 +453,7 @@ getdoe <- function(list,
 
         # filter the data based on rsd/intensity
         data <- list$data
-        lv <- list$group
+        lv <- list$group[,-1,drop=FALSE]
         cols <- colnames(lv)
         # one peak for metabolomics is hard to happen
         if (sum(NROW(lv) > 1) != 0) {
@@ -498,17 +520,17 @@ getpower <-
                  qt = 0.05,
                  powert = 0.8,
                  imputation = "l") {
-                group <- as.factor(list$group)
+                group <- as.factor(list$group[,-1])
                 g <- unique(group)
                 ng <- length(g)
                 n <- min(table(group))
                 list <- getdoe(list, imputation = imputation)
                 sd <- apply(list$groupmean, 1, mean)
                 if (ng == 2) {
-                        ar <- genefilter::rowttests(list$data, fac = group)
-                        dm <- ar$dm
+                        ar <- apply(list$data, 1, function(x) stats::t.test(x~group))
+                        dm <- sapply(ar,function(x) x$estimate[1]-x$estimate[2])
                         m <- nrow(list$data)
-                        p <- ar$p.value
+                        p <- sapply(ar,function(x) x$p.value)
                         q <- stats::p.adjust(p, method = "BH")
                         qc <- c(1:m) * pt / m
                         cf <- qc[match(order(qc), order(q))]
@@ -536,12 +558,12 @@ getpower <-
                         list$power <- re$power
                         list$n <- n
                 } else{
-                        sdg <- genefilter::rowSds(list$groupmean)
+                        sdg <- apply(list$groupmean, 1, function(x) stats::sd(x))
                         ar <-
-                                genefilter::rowFtests(list$data, group)
-                        p <- ar$p.value
-                        q <- stats::p.adjust(p, method = "BH")
+                                apply(list$data,1, function(x) stats::anova(stats::lm(x~group)))
+                        p <- sapply(ar,function(x) x$`Pr(>F)`[1])
                         m <- nrow(list$data)
+                        q <- stats::p.adjust(p, method = "BH")
                         qc <- c(1:m) * pt / m
                         cf <- qc[match(order(qc), order(q))]
                         re <- stats::power.anova.test(
@@ -555,9 +577,9 @@ getpower <-
                         for (i in 1:m) {
                                 re2 <- try(stats::power.anova.test(
                                         groups = ng,
-                                        between.var = sdg,
-                                        within.var = sd,
-                                        sig.level = cf,
+                                        between.var = sdg[i],
+                                        within.var = sd[i],
+                                        sig.level = cf[i],
                                         power = powert
                                 ),
                                 silent = T)
@@ -567,7 +589,7 @@ getpower <-
                                         n[i] <- re2$n
                         }
                         list$power <- re$power
-                        list$n <- re2$n
+                        list$n <- n
                 }
                 return(list)
         }

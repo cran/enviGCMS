@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Miao Yu" />
 
-<meta name="date" content="2020-02-03" />
+<meta name="date" content="2020-06-04" />
 
 <title>Data analysis of GC-MS and LC-MS in Envrionmental Science</title>
 
@@ -31,9 +31,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -202,7 +199,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -217,7 +215,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Data analysis of GC-MS and LC-MS in Envrionmental Science</h1>
 <h4 class="author">Miao Yu</h4>
-<h4 class="date">2020-02-03</h4>
+<h4 class="date">2020-06-04</h4>
 
 
 
@@ -236,7 +234,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="data-input" class="section level3">
 <h3>Data input</h3>
 <p>You could use <code>getmd</code> to import the mass spectrum data as supported by <code>xcms</code> and get the profile of GC-MS data matrix. <code>mzstep</code> is the bin step for mass:</p>
-<pre><code>data &lt;- enviGCMS:::getmd('data/data1.CDF', mzstep = 0.1)</code></pre>
+<pre><code>data &lt;- enviGCMS:::getmd(&#39;data/data1.CDF&#39;, mzstep = 0.1)</code></pre>
 <p>You could also subset the data by the mass(m/z 100-1000) or retention time range(40-100s) in <code>getmd</code> function:</p>
 <pre><code>data &lt;- enviGCMS:::getmd(data,mzrange=c(100,1000),rtrange=c(40,100))</code></pre>
 <p>You could also combined the mass full-scan data with the same range of retention time by <code>cbmd</code>:</p>
