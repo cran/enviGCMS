@@ -8,27 +8,27 @@
 #' @param x vector
 #' @return Mode of the vector
 #' @export
-Mode = function(x) {
-        ta = table(x)
-        tam = max(ta)
+Mode <- function(x) {
+        ta <- table(x)
+        tam <- max(ta)
         if (all(ta == tam))
-                mod = x
+                mod <- x
         else if (is.numeric(x))
-                mod = as.numeric(names(ta)[ta == tam])
+                mod <- as.numeric(names(ta)[ta == tam])
         else
-                mod = names(ta)[ta == tam]
+                mod <- names(ta)[ta == tam]
         return(mod)
 }
 #' filter data by average moving box
 #'
 #' @param x a vector
-#' @param n A number to indentify the size of the moving box.
+#' @param n A number to identify the size of the moving box.
 #' @return The filtered data
 #' @examples
 #' ma(rnorm(1000),5)
 #' @export
 ma <- function(x, n) {
-        stats::filter(x, rep(1 / n, n), circular = T)
+        stats::filter(x, rep(1 / n, n), circular = TRUE)
 }
 
 #' Import data and return the annotated matrix for GC/LC-MS by m/z range and retention time
@@ -46,8 +46,8 @@ ma <- function(x, n) {
 #' }
 getmd <- function(data,
                   mzstep = 0.1,
-                  mzrange = F,
-                  rtrange = F) {
+                  mzrange = FALSE,
+                  rtrange = FALSE) {
         data <- xcms::xcmsRaw(data, profstep = mzstep)
         pf <- xcms::profMat(data)
         rownames(pf) <- mz <- xcms::profMz(data)
@@ -184,7 +184,7 @@ submd <- function(data1,
 #' dev.off()
 #' }
 #' @export
-plotms <- function(data, log = F) {
+plotms <- function(data, log = FALSE) {
         # get the mz and rt range and rotate the matrix to
         # adapt the image function
         indmz <- as.numeric(rownames(data))
@@ -202,7 +202,7 @@ plotms <- function(data, log = F) {
         # show the intensity scale in log 10 based scale
         graphics::par(mar = c(2, 5, 1, 4), fig = c(0, 1, 0.9,
                                                    1))
-        zlim <- range(z, na.rm = T)
+        zlim <- range(z, na.rm = TRUE)
         breaks <- seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
         poly <- vector(mode = "list", length(col))
         graphics::plot(
@@ -257,14 +257,14 @@ plotms <- function(data, log = F) {
                 mar = c(4, 5, 0, 4),
                 fig = c(0, 1, 0,
                         0.9),
-                new = T
+                new = TRUE
         )
         graphics::image(
                 z,
                 ylab = "",
-                axes = F,
+                axes = FALSE,
                 col = col,
-                useRaster = T
+                useRaster = TRUE
         )
         # display the m/z as y
         mzy <- seq(0, 1, length.out = length(indmz))
@@ -293,7 +293,7 @@ plotms <- function(data, log = F) {
                 mar = c(4, 5, 4, 4),
                 fig = c(0, 1, 0,
                         0.9),
-                new = T,
+                new = TRUE,
                 cex.lab = 1
         )
         data[is.na(data)] <- 0
@@ -303,7 +303,7 @@ plotms <- function(data, log = F) {
                 type = "l",
                 ylab = "intensity",
                 xlab = "retention time(s)",
-                frame.plot = F,
+                frame.plot = FALSE,
                 xaxs = "i",
                 yaxs = "i"
         )
@@ -330,9 +330,9 @@ plotmz <- function(data, inscf = 5, ...) {
         mz <- as.numeric(rownames(data))
         rt <- as.numeric(colnames(data))
         z <- log10(data + 1)
-        cex = as.numeric(cut(z - inscf, breaks = c(0, 1, 2,
+        cex <- as.numeric(cut(z - inscf, breaks = c(0, 1, 2,
                                                    3, 4, Inf) / 2)) / 2
-        cexlab = c(
+        cexlab <- c(
                 paste0(inscf, "-", inscf + 0.5),
                 paste0(inscf +
                                0.5, "-", inscf + 1),
@@ -367,7 +367,7 @@ plotmz <- function(data, inscf = 5, ...) {
                 pt.cex = c(1, 2, 3, 4, 5) / 2,
                 pch = 19,
                 bty = "n",
-                horiz = T,
+                horiz = TRUE,
                 cex = 0.7,
                 col = grDevices::rgb(0, 0,
                                      1, 0.1),
@@ -378,7 +378,7 @@ plotmz <- function(data, inscf = 5, ...) {
 #' plot GC-MS data as a heatmap for constant speed of temperature rising
 #' @param data imported data matrix of GC-MS
 #' @param log transform the intensity into log based 10
-#' @param temp temprature range for constant speed
+#' @param temp temperature range for constant speed
 #' @return heatmap
 #' @examples
 #' \dontrun{
@@ -387,7 +387,7 @@ plotmz <- function(data, inscf = 5, ...) {
 #' }
 #' @export
 plott <- function(data,
-                  log = F,
+                  log = FALSE,
                   temp = c(100, 320)) {
         indmz <- as.numeric(rownames(data))
         indrt <- as.numeric(colnames(data))
@@ -405,10 +405,10 @@ plott <- function(data,
                 mar = c(2, 5, 1, 4),
                 fig = c(0, 1, 0.9,
                         1),
-                new = F
+                new = FALSE
         )
         # get the mz and rt range and rotate the matrix to
-        zlim <- range(z, na.rm = T)
+        zlim <- range(z, na.rm = TRUE)
         breaks <- seq(zlim[1], zlim[2], round((zlim[2] - zlim[1]) / 10))
         poly <- vector(mode = "list", length(col))
         graphics::plot(
@@ -463,16 +463,16 @@ plott <- function(data,
                 mar = c(4, 5, 0, 4),
                 fig = c(0, 1, 0,
                         0.9),
-                new = T
+                new = TRUE
         )
         graphics::image(
                 z,
                 xlab = expression("Temperature (" *
                                           degree * C * ")"),
                 ylab = "m/z",
-                axes = F,
+                axes = FALSE,
                 col = col,
-                useRaster = T
+                useRaster = TRUE
         )
         # display the temperature as x
         rtx <- seq(0, 1, length.out = length(indrt))
@@ -489,7 +489,7 @@ plott <- function(data,
                        las = 2)
 }
 
-#' Plot the backgrond of data
+#' Plot the background of data
 #' @param data imported data matrix of GC-MS
 #' @return NULL
 #' @examples
@@ -517,7 +517,7 @@ plotsub <- function(data) {
 #' plotrtms(matrix,rt = c(500,1000),ms = (300,500))
 #' }
 #' @export
-plotrtms <- function(data, rt, ms, msp=F) {
+plotrtms <- function(data, rt, ms, msp = FALSE) {
         data <- getmd(data, rt, ms)
         temp <- apply(data, 1, mean)
         graphics::plot(
@@ -528,7 +528,7 @@ plotrtms <- function(data, rt, ms, msp=F) {
                 ylab = "intensity",
                 xlab = "m/z",
                 xaxt = "n",
-                frame.plot = F
+                frame.plot = FALSE
         )
         mz <- as.numeric(names(temp))
         index <- seq(1, length(temp))
@@ -538,7 +538,7 @@ plotrtms <- function(data, rt, ms, msp=F) {
         return(temp)
 }
 
-#' Plot EIC of certain m/z and return dataframe for intergration
+#' Plot EIC of certain m/z and return dataframe for integration
 #' @param data imported data matrix of GC-MS
 #' @param ms m/z to be extracted
 #' @param rt vector range of the retention time
@@ -550,7 +550,7 @@ plotrtms <- function(data, rt, ms, msp=F) {
 #' plotmsrt(matrix,rt = c(500,1000),ms = 300)
 #' }
 #' @export
-plotmsrt <- function(data, ms, rt, n = F) {
+plotmsrt <- function(data, ms, rt, n = FALSE) {
         data <- getmd(data, rt, c(ms, ms + 1))[1,]
         if (n) {
                 data <- ma(data, n)
@@ -564,7 +564,7 @@ plotmsrt <- function(data, ms, rt, n = F) {
                 main = bquote("m/z = " ~ .(ms)),
                 ylab = "intensity",
                 xlab = "retention time(s)",
-                frame.plot = F
+                frame.plot = FALSE
         )
         data <- data.frame(x, data)
         colnames(data) <- c("RT", "Intensity")
@@ -581,7 +581,7 @@ plotmsrt <- function(data, ms, rt, n = F) {
 #' plottic(matrix)
 #' }
 #' @export
-plottic <- function(data, n = F) {
+plottic <- function(data, n = FALSE) {
         data <- apply(data, 2, sum)
         if (n) {
                 data <- ma(data, n)
@@ -592,16 +592,16 @@ plottic <- function(data, n = F) {
                 type = "l",
                 ylab = "intensity",
                 xlab = "retention time(s)",
-                frame.plot = F
+                frame.plot = FALSE
         )
 }
-#' plot the information of intergretion
-#' @param list list from getinteragtion
+#' plot the information of integration
+#' @param list list from getinteagtion
 #' @param name the title of the plot
 #' @return NULL
 #' @examples
 #' \dontrun{
-#' list <- getinteragtion(rawdata)
+#' list <- getinteagtion(rawdata)
 #' plotint(list)
 #' }
 #' @export
@@ -668,8 +668,8 @@ plotint <- function(list, name = NULL) {
                              format(sigpeak, digits = 2)),
                        col = "red")
 }
-#' plot the slope information of intergretion
-#' @param list list from getinteragtion
+#' plot the slope information of integration
+#' @param list list from getintegration
 #' @param name the title of the plot
 #' @return NULL
 #' @examples
@@ -716,7 +716,7 @@ plotintslope <- function(list, name = NULL) {
 #' find line of the regression model for GC-MS
 #' @param data imported data matrix of GC-MS
 #' @param threshold the threshold of the response (log based 10)
-#' @param temp the scale of the oven temprature(constant rate)
+#' @param temp the scale of the oven temperature (constant rate)
 #' @return list linear regression model for the matrix
 #' @examples
 #' \dontrun{
@@ -754,7 +754,7 @@ findline <- function(data,
                 xaxt = "n",
                 yaxt = "n",
                 main = "",
-                frame.plot = F
+                frame.plot = FALSE
         )
         # display the temperature as x
         temp <- round(seq(temp[1], temp[2], length.out = length(x)))
@@ -814,7 +814,7 @@ findline <- function(data,
 
 #' Plot the response group of GC-MS
 #' @param data imported data matrix of GC-MS
-#' @param threshold the threshold of the response (log based 10) to seperate the group
+#' @param threshold the threshold of the response (log based 10) to separate the group
 #' @return list linear regression model for the data matrix
 #' @examples
 #' \dontrun{
@@ -853,9 +853,9 @@ plotgroup <- function(data, threshold = 2) {
                 t(group),
                 xlab = "retention time(min)",
                 ylab = "m/z",
-                axes = F,
+                axes = FALSE,
                 col = grDevices::heat.colors(2),
-                useRaster = T
+                useRaster = TRUE
         )
         indmz <- as.numeric(rownames(data))
         indrt <- as.numeric(colnames(data))
@@ -896,7 +896,7 @@ plotsms <- function(meanmatrix, rsdmatrix) {
                 mar = c(4.2, 4.2, 0, 1.5),
                 fig = c(0,
                         1, 0, 0.8),
-                new = F,
+                new = FALSE,
                 cex.axis = 1.5,
                 cex.lab = 1.5
         )
@@ -907,7 +907,7 @@ plotsms <- function(meanmatrix, rsdmatrix) {
                 xlab = "Intensity",
                 ylab = "Relative Standard Deviation(%)",
                 xaxt = "n",
-                frame.plot = F
+                frame.plot = FALSE
         )
         graphics::abline(h = 20,
                          lty = 2,
@@ -932,7 +932,7 @@ plotsms <- function(meanmatrix, rsdmatrix) {
                 oma = c(0, 0,
                         0, 0),
                 fig = c(0, 1, 0.8, 1),
-                new = T,
+                new = TRUE,
                 cex.axis = 1.5,
                 cex.lab = 1.5
         )
@@ -959,7 +959,7 @@ plotsms <- function(meanmatrix, rsdmatrix) {
         )
 }
 
-#' plot the density of the GC-MS data with EM algorithm to seperate the data into two log normal distribution.
+#' plot the density of the GC-MS data with EM algorithm to separate the data into two log normal distribution.
 #' @param data imported data matrix of GC-MS
 #' @return NULL
 #' @examples
@@ -969,8 +969,8 @@ plotsms <- function(meanmatrix, rsdmatrix) {
 #' }
 #' @export
 plothist <- function(data) {
-        data1 = sample(data, 1e+05)
-        mixmdl = mixtools::normalmixEM(log10(data1))
+        data1 <- sample(data, 1e+05)
+        mixmdl <- mixtools::normalmixEM(log10(data1))
         graphics::plot(mixmdl,
                        which = 2,
                        breaks = 100,
@@ -991,7 +991,7 @@ plothist <- function(data) {
         )
 }
 #' plot the calibration curve with error bar, r squared and equation.
-#' @param x concertration
+#' @param x concentration
 #' @param y response
 #' @param upper upper error bar
 #' @param lower lower error bar

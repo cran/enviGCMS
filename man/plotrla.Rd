@@ -4,14 +4,16 @@
 \alias{plotrla}
 \title{Relative Log Abundance (RLA) plots}
 \usage{
-plotrla(data, lv, type = "g")
+plotrla(data, lv, type = "g", ...)
 }
 \arguments{
-\item{data}{data as mzrt profile}
+\item{data}{data row as peaks and column as samples}
 
-\item{lv}{factor vector for the group infomation}
+\item{lv}{factor vector for the group information}
 
 \item{type}{'g' means group median based, other means all samples median based.}
+
+\item{...}{parameters for boxplot}
 }
 \value{
 Relative Log Abundance (RLA) plots

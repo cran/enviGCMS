@@ -4,14 +4,14 @@
 \alias{plott}
 \title{plot GC-MS data as a heatmap for constant speed of temperature rising}
 \usage{
-plott(data, log = F, temp = c(100, 320))
+plott(data, log = FALSE, temp = c(100, 320))
 }
 \arguments{
 \item{data}{imported data matrix of GC-MS}
 
 \item{log}{transform the intensity into log based 10}
 
-\item{temp}{temprature range for constant speed}
+\item{temp}{temperature range for constant speed}
 }
 \value{
 heatmap

@@ -18,6 +18,7 @@ plotpeak <- function(data,
                      indexy = NULL,
                      ...) {
         # from http://karolis.koncevicius.lt/posts/r_base_plotting_without_wrappers/
+        data <- as.matrix(data)
         grDevices::palette(c("cornflowerblue", "red3", "orange"))
         if (!is.null(indexx)) {
                 data <- data[indexx,]
@@ -30,7 +31,7 @@ plotpeak <- function(data,
         graphics::plot.window(xlim = c(1, nrow(data)), ylim = range(data))
         graphics::grid(nx = NA, ny = NULL)
         graphics::abline(
-                v = 1:nrow(data),
+                v = seq_len(nrow(data)),
                 col = "grey",
                 lwd = 5,
                 lty = "dotted"
@@ -44,7 +45,7 @@ plotpeak <- function(data,
                         col = unique(lv),
                         lwd = 3,
                         bty = 'n',
-                        horiz = T
+                        horiz = TRUE
                 )
         } else{
                 graphics::matlines(
@@ -63,7 +64,7 @@ plotpeak <- function(data,
         graphics::mtext(
                 stats::variable.names(t(data)),
                 3,
-                at = 1:nrow(data),
+                at = seq_len(nrow(data)),
                 line = 1,
                 col = "darkgrey"
         )
@@ -87,6 +88,7 @@ plotridge <- function(data,
                       indexy = NULL,
                       ...) {
         # from http://karolis.koncevicius.lt/posts/r_base_plotting_without_wrappers/
+        data <- as.matrix(data)
         if (!is.null(indexx)) {
                 data <- data[indexx,]
         }
@@ -106,8 +108,9 @@ plotridge <- function(data,
                                                                  1.5))
         graphics::abline(h = length(ys):1, col = "grey")
 
-        if (!is.null(lv)) {
+        if (!is.null(lv) & nlevels(lv) != 1) {
                 col <- grDevices::hcl.colors(nlevels(lv), "Zissou", alpha = 0.8)
+
                 Map(graphics::polygon,
                     xs,
                     ys,
@@ -116,10 +119,10 @@ plotridge <- function(data,
                         'topright',
                         inset = c(0, -.05),
                         legend = unique(lv),
-                        col = unique(lv),
-                        lwd = 3,
+                        col = col[unique(lv)],
+                        lwd = 10,
                         bty = 'n',
-                        horiz = T
+                        horiz = TRUE
                 )
         } else{
                 Map(
@@ -165,6 +168,7 @@ plotrug <- function(data,
                     indexx = NULL,
                     indexy = NULL,
                     ...) {
+        data <- as.matrix(data)
         if (!is.null(indexx)) {
                 data <- data[indexx,]
         }
@@ -173,10 +177,12 @@ plotrug <- function(data,
                 lv <- lv[indexy]
         }
 
-        rugs <- apply(data, 2, function(x) x[order(x)])
+        rugs <- apply(data, 2, function(x)
+                x[order(x)])
 
         rugs <- as.list(as.data.frame(rugs))
-        rugs <- lapply(rugs, function(x) x[is.finite(x)])
+        rugs <- lapply(rugs, function(x)
+                x[is.finite(x)])
 
         graphics::plot.new()
         graphics::plot.window(xlim = range(rugs), ylim = c(1, length(rugs) +
@@ -184,7 +190,7 @@ plotrug <- function(data,
 
 
         len <- Map(length, rugs)
-        idx <- 1:length(rugs)
+        idx <- seq_along(rugs)
         yl <- Map(function(x, y)
                 rep(y - 0.3, x), len, idx)
         yh <- Map(function(x, y)
@@ -204,7 +210,7 @@ plotrug <- function(data,
                         col = unique(lv),
                         lwd = 3,
                         bty = 'n',
-                        horiz = T
+                        horiz = TRUE
 
                 )
         } else{
@@ -284,11 +290,11 @@ plotmr <- function(list,
                 )
 
                 for (i in 1:n) {
-                        cex = as.numeric(cut((log10(data[, i] + 1) -
-                                                      inscf),
-                                             breaks = c(0, 1, 2, 3, 4, Inf) / 2
+                        cex <- as.numeric(cut((log10(data[, i] + 1) -
+                                                       inscf),
+                                              breaks = c(0, 1, 2, 3, 4, Inf) / 2
                         )) / 2
-                        cexlab = c(
+                        cexlab <- c(
                                 paste0(inscf, "-", inscf + 0.5),
                                 paste0(inscf + 0.5, "-", inscf + 1),
                                 paste0(inscf +
@@ -330,7 +336,7 @@ plotmr <- function(list,
                         legend = dataname,
                         col = col,
                         pch = 19,
-                        horiz = T,
+                        horiz = TRUE,
                         bty = "n",
                         inset = c(0,-0.25)
                 )
@@ -341,7 +347,7 @@ plotmr <- function(list,
                         pt.cex = c(1, 2, 3, 4, 5) / 4,
                         pch = 19,
                         bty = "n",
-                        horiz = T,
+                        horiz = TRUE,
                         cex = 0.7,
                         col = grDevices::rgb(0,
                                              0, 0, 0.318),
@@ -358,12 +364,12 @@ plotmr <- function(list,
                         xlim = rt,
                         ...
                 )
-                cex = as.numeric(cut((log10(
+                cex <- as.numeric(cut((log10(
                         data + 1
                 ) -
                         inscf), breaks = c(0, 1, 2, 3, 4, Inf) /
                         2)) / 2
-                cexlab = c(
+                cexlab <- c(
                         paste0(inscf, "-", inscf + 0.5),
                         paste0(inscf + 0.5, "-", inscf + 1),
                         paste0(inscf +
@@ -404,7 +410,7 @@ plotmr <- function(list,
                         legend = unique(list$group$sample_group),
                         col = col,
                         pch = 19,
-                        horiz = T,
+                        horiz = TRUE,
                         bty = "n",
                         inset = c(0,-0.25)
                 )
@@ -415,7 +421,7 @@ plotmr <- function(list,
                         pt.cex = c(1, 2, 3, 4, 5) / 4,
                         pch = 19,
                         bty = "n",
-                        horiz = T,
+                        horiz = TRUE,
                         cex = 0.7,
                         col = grDevices::rgb(0,
                                              0, 0, 0.318),
@@ -438,7 +444,7 @@ plotmr <- function(list,
         })
 }
 
-#' plot the diff scatter plot for one xcmsset objects with threshold between two groups
+#' plot the diff scatter plot for peaks list with threshold between two groups
 #' @param list list with data as peaks list, mz, rt and group information
 #' @param ms the mass range to plot the data
 #' @param inscf Log intensity cutoff for peaks across samples. If any peaks show a intensity higher than the cutoff in any samples, this peaks would not be filtered. default 5
@@ -469,6 +475,7 @@ plotmrc <- function(list,
         dataname <- colnames(data)
         mz <- lif$mz
         rt <- lif$rt
+        graphics::par(mar = c(5, 4.2, 6.1, 2.1), xpd = TRUE)
         suppressWarnings(if (!is.na(data[1, 1])) {
                 diff1 <- data[, 1] - data[, 2]
                 diff2 <- data[, 2] - data[, 1]
@@ -477,15 +484,15 @@ plotmrc <- function(list,
                 name1 <- paste0(dataname[1], "-", dataname[2])
                 name2 <- paste0(dataname[2], "-", dataname[1])
 
-                cex1 = as.numeric(cut((log10(
+                cex1 <- as.numeric(cut((log10(
                         diff1 + 1
                 ) - inscf),
-                breaks = c(0, 1, 2, 3, 4, Inf) / 2)) / 2
-                cex2 = as.numeric(cut((log10(
+                breaks <- c(0, 1, 2, 3, 4, Inf) / 2)) / 2
+                cex2 <- as.numeric(cut((log10(
                         diff2 + 1
                 ) - inscf),
-                breaks = c(0, 1, 2, 3, 4, Inf) / 2)) / 2
-                cexlab = c(
+                breaks <- c(0, 1, 2, 3, 4, Inf) / 2)) / 2
+                cexlab <- c(
                         paste0(inscf, "-", inscf + 0.5),
                         paste0(inscf +
                                        0.5, "-", inscf + 1),
@@ -517,7 +524,7 @@ plotmrc <- function(list,
                 )
 
                 graphics::legend(
-                        "topleft",
+                        'topleft',
                         legend = cexlab,
                         title = "Intensity in Log scale",
                         pt.cex = c(1, 2, 3, 4, 5) / 2,
@@ -525,11 +532,11 @@ plotmrc <- function(list,
                         col = grDevices::rgb(0,
                                              0, 0, 0.618),
                         bty = "n",
-                        horiz = T,
+                        horiz = TRUE,
                         inset = c(0,-0.25)
                 )
                 graphics::legend(
-                        "topright",
+                        'topright',
                         legend = c(name1,
                                    name2),
                         pch = 19,
@@ -539,7 +546,7 @@ plotmrc <- function(list,
                                 grDevices::rgb(1, 0, 0, 0.618)
                         ),
                         bty = "n",
-                        horiz = T,
+                        horiz = TRUE,
                         inset = c(0,-0.25)
                 )
         } else {
@@ -557,7 +564,7 @@ plotmrc <- function(list,
 
 }
 
-#' plot the rsd influnces of data in different groups
+#' plot the rsd influences of data in different groups
 #' @param list list with data as peaks list, mz, rt and group information
 #' @param ms the mass range to plot the data
 #' @param inscf Log intensity cutoff for peaks across samples. If any peaks show a intensity higher than the cutoff in any samples, this peaks would not be filtered. default 5
@@ -576,7 +583,7 @@ plotrsd <- function(list,
                     imputation = "l",
                     ...) {
         graphics::par(mar = c(5, 4.2, 6.1, 2.1), xpd = TRUE)
-        cexlab = c("<20%", "20-40%", "40-60%", "60-80%", ">80%")
+        cexlab <- c("<20%", "20-40%", "40-60%", "60-80%", ">80%")
         list <- getdoe(list,
                        rsdcf = rsdcf,
                        inscf = inscf,
@@ -593,8 +600,8 @@ plotrsd <- function(list,
         if (is.null(dim(rsd))) {
                 n <- 1
                 col <- grDevices::rainbow(1)
-                cex = as.numeric(cut(rsd, breaks = c(0, 20,
-                                                     40, 60, 80, Inf))) / 2
+                cex <- as.numeric(cut(rsd, breaks = c(0, 20,
+                                                      40, 60, 80, Inf))) / 2
                 dataname <- unique(lif$group$sample_group)
                 graphics::plot(
                         mz ~ rt,
@@ -617,7 +624,7 @@ plotrsd <- function(list,
                         "topright",
                         legend = dataname,
                         col = col,
-                        horiz = T,
+                        horiz = TRUE,
                         pch = 19,
                         bty = "n",
                         inset = c(0,-0.25)
@@ -629,7 +636,7 @@ plotrsd <- function(list,
                                    2, 3, 4, 5) / 2,
                         pch = 19,
                         bty = "n",
-                        horiz = T,
+                        horiz = TRUE,
                         cex = 0.8,
                         col = grDevices::rgb(0, 0, 0, 0.318),
                         inset = c(0,-0.25)
@@ -648,7 +655,7 @@ plotrsd <- function(list,
                 )
 
                 for (i in 1:n) {
-                        cex = as.numeric(cut(rsd[, i], breaks = c(
+                        cex <- as.numeric(cut(rsd[, i], breaks = c(
                                 0, 20,
                                 40, 60, 80, Inf
                         ))) / 2
@@ -665,7 +672,7 @@ plotrsd <- function(list,
                         "topright",
                         legend = dataname,
                         col = col,
-                        horiz = T,
+                        horiz = TRUE,
                         pch = 19,
                         bty = "n",
                         inset = c(0,-0.25)
@@ -677,7 +684,7 @@ plotrsd <- function(list,
                                    2, 3, 4, 5) / 2,
                         pch = 19,
                         bty = "n",
-                        horiz = T,
+                        horiz = TRUE,
                         cex = 0.8,
                         col = grDevices::rgb(0, 0, 0, 0.318),
                         inset = c(0,-0.25)
@@ -687,14 +694,14 @@ plotrsd <- function(list,
 
 
 #' plot the PCA for multiple samples
-#' @param data mzrt profile with row peaks and column samples
+#' @param data data row as peaks and column as samples
 #' @param lv group information
 #' @param index index for selected peaks
 #' @param center parameters for PCA
 #' @param scale parameters for scale
 #' @param xrange x axis range for return samples, default NULL
 #' @param yrange y axis range for return samples, default NULL
-#' @param pch deault pch would be the first charactor of group information or samples name
+#' @param pch default pch would be the first character of group information or samples name
 #' @param ... other parameters for `plot` function
 #' @return if xrange and yrange are not NULL, return file name of all selected samples on 2D score plot
 #' @examples
@@ -704,25 +711,27 @@ plotrsd <- function(list,
 plotpca <- function(data,
                     lv = NULL,
                     index = NULL,
-                    center = T,
-                    scale = T,
+                    center = TRUE,
+                    scale = TRUE,
                     xrange = NULL,
                     yrange = NULL,
                     pch = NULL,
                     ...) {
+        data <- as.matrix(data)
         if (!is.null(index)) {
                 data <- data[index,]
         }
 
         if (is.null(lv)) {
-                pch0 = colnames(data)
+                pch0 <- colnames(data)
         } else {
-                pch0 = lv
+                pch0 <- lv
         }
         pcao <-
                 stats::prcomp(t(data), center = center, scale = scale)
-        pcaoVars = signif(((pcao$sdev) ^ 2) / (sum((pcao$sdev) ^ 2)),
-                          3) * 100
+        pcaoVars <-
+                signif(((pcao$sdev) ^ 2) / (sum((pcao$sdev) ^ 2)),
+                       3) * 100
         if (!is.null(pch)) {
                 graphics::plot(
                         pcao$x[, 1],
@@ -759,7 +768,7 @@ plotpca <- function(data,
 }
 
 #' Plot the heatmap of mzrt profiles
-#' @param data mzrt profile with row peaks and column samples
+#' @param data data row as peaks and column as samples
 #' @param lv group information
 #' @param index index for selected peaks
 #' @return NULL
@@ -768,6 +777,7 @@ plotpca <- function(data,
 #' plothm(list$data, lv = as.factor(list$group$sample_group))
 #' @export
 plothm <- function(data, lv, index = NULL) {
+        data <- as.matrix(data)
         icolors <-
                 (grDevices::colorRampPalette(rev(
                         RColorBrewer::brewer.pal(11,
@@ -795,7 +805,7 @@ plothm <- function(data, lv, index = NULL) {
                         yaxs = "i",
                         ylab = "",
                         xlab = "",
-                        frame.plot = F
+                        frame.plot = FALSE
                 )
                 graphics::axis(
                         4,
@@ -862,7 +872,7 @@ plothm <- function(data, lv, index = NULL) {
 }
 
 #' plot the density for multiple samples
-#' @param data mzrt profile with row peaks and column samples
+#' @param data data row as peaks and column as samples
 #' @param lv group information
 #' @param index index for selected peaks
 #' @param name name on the figure for samples
@@ -879,10 +889,11 @@ plotden <- function(data,
                     name = NULL,
                     lwd = 1,
                     ...) {
+        data <- as.matrix(data)
         if (!is.null(index)) {
                 data <- data[index,]
         }
-        xlim <- range(log10(data + 1), na.rm = T)
+        xlim <- range(log10(data + 1), na.rm = TRUE)
         if (is.null(lv)) {
                 col <- as.numeric(as.factor(colnames(data)))
                 coli <- unique(colnames(data))
@@ -916,18 +927,20 @@ plotden <- function(data,
         )
 }
 #' Relative Log Abundance (RLA) plots
-#' @param data data as mzrt profile
-#' @param lv factor vector for the group infomation
+#' @param data data row as peaks and column as samples
+#' @param lv factor vector for the group information
 #' @param type 'g' means group median based, other means all samples median based.
+#' @param ... parameters for boxplot
 #' @return Relative Log Abundance (RLA) plots
 #' @examples
 #' data(list)
 #' plotrla(list$data, as.factor(list$group$sample_group))
 #' @export
-plotrla <- function(data, lv, type = "g") {
+plotrla <- function(data, lv, type = "g", ...) {
+        data <- as.matrix(data)
         data <- log(data)
-        data[is.nan(data)|is.infinite(data)] <- 0
-        outmat = NULL
+        data[is.nan(data) | is.infinite(data)] <- 0
+        outmat <- NULL
 
         if (type == "g") {
                 for (lvi in levels(lv)) {
@@ -943,13 +956,13 @@ plotrla <- function(data, lv, type = "g") {
         }
 
         outmat <- outmat[, order(lv)]
-        graphics::boxplot(outmat, col = lv[order(lv)])
+        graphics::boxplot(outmat, ...)
         graphics::abline(h = 0)
 }
 
 #' Relative Log Abundance Ridge (RLAR) plots for samples or peaks
-#' @param data data as mzrt profile
-#' @param lv factor vector for the group infomation of samples
+#' @param data data row as peaks and column as samples
+#' @param lv factor vector for the group information of samples
 #' @param type 'g' means group median based, other means all samples median based.
 #' @return Relative Log Abundance Ridge(RLA) plots
 #' @examples
@@ -957,19 +970,21 @@ plotrla <- function(data, lv, type = "g") {
 #' plotridges(list$data, as.factor(list$group$sample_group))
 #' @export
 plotridges <- function(data, lv, type = "g") {
+        data <- as.matrix(data)
         data <- log(data)
-        data[is.nan(data)|is.infinite(data)] <- 0
-        outmat = NULL
+        data[is.nan(data) | is.infinite(data)] <- 0
+        outmat <- NULL
 
         if (type == "g") {
                 for (lvi in levels(lv)) {
                         submat <- data[, lv == lvi]
-                        if(is.null(dim(submat))){
+                        if (is.null(dim(submat))) {
                                 tempmat <- submat
 
-                        }else{
+                        } else{
                                 median <- apply(submat, 1, median)
-                                tempmat <- sweep(submat, 1, median, "-")
+                                tempmat <-
+                                        sweep(submat, 1, median, "-")
                         }
 
                         outmat <- cbind(outmat, tempmat)
@@ -998,39 +1013,45 @@ plotdwtus <- function(list, n = 512, ...) {
                         dwtus ~ as.numeric(list$order),
                         xlab = 'Run order',
                         ylab = 'DWTUS',
-                        col = as.numeric(as.factor(list$group$sample_group)),
+                        col = as.numeric(as.factor(
+                                list$group$sample_group
+                        )),
                         ...
                 )
                 graphics::legend(
                         'topright',
                         legend = unique(list$group$sample_group),
-                        col = unique(as.numeric(as.factor(
-                                list$group$sample_group
-                        ))),
+                        col = unique(as.numeric(
+                                as.factor(list$group$sample_group)
+                        )),
                         pch = 19,
                         bty = 'n'
                 )
         } else{
                 graphics::plot(
-                        dwtus ~ as.numeric(as.factor(list$group$sample_group)),
+                        dwtus ~ as.numeric(as.factor(
+                                list$group$sample_group
+                        )),
                         xlab = 'Group',
                         ylab = 'DWTUS',
-                        col = as.numeric(as.factor(list$group$sample_group)),
+                        col = as.numeric(as.factor(
+                                list$group$sample_group
+                        )),
                         ...
                 )
                 graphics::legend(
                         'topright',
                         legend = unique(list$group$sample_group),
-                        col = unique(as.numeric(as.factor(
-                                list$group$sample_group
-                        ))),
+                        col = unique(as.numeric(
+                                as.factor(list$group$sample_group)
+                        )),
                         pch = 19,
                         bty = 'n'
                 )
         }
 }
 
-#' plot scatter plot for rt-mz profile and output gif file for mutiple groups
+#' plot scatter plot for rt-mz profile and output gif file for multiple groups
 #' @param list list with data as peaks list, mz, rt and group information
 #' @param name file name for gif file, default test
 #' @param ms the mass range to plot the data
@@ -1062,7 +1083,7 @@ gifmr <- function(list,
         data <- lif$groupmean
         mz <- lif$mz
         rt <- lif$rt
-        filename = paste0(name, ".gif")
+        filename <- paste0(name, ".gif")
         mean <- apply(data, 1, mean)
 
         graphics::plot(

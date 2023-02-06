@@ -18,7 +18,7 @@
 #' @export
 getdata <-
         function(path,
-                 index = F,
+                 index = FALSE,
                  BPPARAM = BiocParallel::SnowParam(),
                  pmethod = "hplcorbitrap",
                  minfrac = 0.67,
@@ -254,7 +254,7 @@ getdata <-
 #' @seealso \code{\link{getdata}},\code{\link{getmzrt}}
 #' @export
 getdata2 <- function(path,
-                     index = F,
+                     index = FALSE,
                      snames = NULL,
                      sclass = NULL,
                      phenoData = NULL,
@@ -280,7 +280,7 @@ getdata2 <- function(path,
 
         fromPaths <- xcms::phenoDataFromPaths(files)
         n <- dim(fromPaths)[2]
-        sample_group = NULL
+        sample_group <- NULL
         if (n > 1) {
                 sample_group <- fromPaths[, 1]
                 for (i in 2:n) {
@@ -288,9 +288,9 @@ getdata2 <- function(path,
                                                                       i], sep = "_")
                 }
         } else {
-                sample_group = fromPaths[, 1]
+                sample_group <- fromPaths[, 1]
         }
-        sample_group = data.frame(sample_group)
+        sample_group <- data.frame(sample_group)
 
         if (is.null(snames)) {
                 snames <- rownames(fromPaths)
@@ -305,10 +305,10 @@ getdata2 <- function(path,
                         pdata <- methods::new("NAnnotatedDataFrame",
                                               sample_group)
         } else {
-                if (class(pdata) == "data.frame")
+                if (inherits(pdata,"data.frame"))
                         pdata <- methods::new("NAnnotatedDataFrame",
                                               sample_group)
-                if (class(pdata) != "NAnnotatedDataFrame")
+                if (!inherits(pdata, "NAnnotatedDataFrame"))
                         stop("phenoData has to be a data.frame or NAnnotatedDataFrame!")
         }
         raw_data <- MSnbase::readMSData(files, pdata = pdata,

@@ -52,17 +52,26 @@ plotkms <- function(data, cutoff = 1000) {
 getmass <- function(data) {
         if (grepl('-', data)) {
                 name <- unlist(strsplit(data, '-'))
-                table1 <- Rdisop::getMolecule(name[1])$isotopes[[1]]
-                table2 <- Rdisop::getMolecule(name[2])$isotopes[[1]]
-                iso1 <-
-                        table1[1,which.max(table1[2,])]
-                iso2 <-
-                        table2[1,which.max(table2[2,])]
-                iso <-
-                        iso1 - iso2
+                if (name[1] == '') {
+                        table2 <- Rdisop::getMolecule(name[2])$isotopes[[1]]
+                        iso2 <-
+                                table2[1, which.max(table2[2, ])]
+                        iso <- 0 - iso2
+                } else{
+                        table1 <- Rdisop::getMolecule(name[1])$isotopes[[1]]
+                        iso1 <-
+                                table1[1, which.max(table1[2, ])]
+                        table2 <-
+                                Rdisop::getMolecule(name[2])$isotopes[[1]]
+                        iso2 <-
+                                table2[1, which.max(table2[2, ])]
+                        iso <-
+                                iso1 - iso2
+                }
+
         } else{
                 table <- Rdisop::getMolecule(data)$isotopes[[1]]
-                iso <- table[1,which.max(table[2,])]
+                iso <- table[1, which.max(table[2, ])]
         }
         return(iso)
 }
@@ -107,7 +116,7 @@ getmdh <- function(mz,
         }
         temp <- getorder(cus)
         cus <- NULL
-        for (i in 1:length(temp)) {
+        for (i in seq_along(temp)) {
                 cus <- c(cus, getmass(temp[i]))
         }
         if (length(cus) == 2) {
@@ -317,7 +326,7 @@ getmdh <- function(mz,
 #' @param mzc threshold of lower mass and higher mass, default 700
 #' @param cutoffint the cutoff of intensity, default 1000
 #' @param cutoffr the cutoff of [M] and [M+2] ratio, default 0.4
-#' @param clustercf the cutoff of cluster analysis to seperate two different ions groups for retention time, default 10
+#' @param clustercf the cutoff of cluster analysis to separate two different ions groups for retention time, default 10
 #' @return list with filtered organohalogen compounds
 #' @references Identification of Novel Brominated Compounds in Flame Retarded Plastics Containing TBBPA by Combining Isotope Pattern and Mass Defect Cluster Analysis Ana Ballesteros-Gómez, Joaquín Ballesteros, Xavier Ortiz, Willem Jonker, Rick Helmus, Karl J. Jobst, John R. Parsons, and Eric J. Reiner Environmental Science & Technology 2017 51 (3), 1518-1526 DOI: 10.1021/acs.est.6b03294
 #' @export
@@ -332,7 +341,7 @@ findohc <-
                  cutoffr = 0.4,
                  clustercf = 10) {
                 mz <- list$mz
-                ins <- apply(list$data, 1, mean, na.rm = T)
+                ins <- apply(list$data, 1, mean, na.rm = TRUE)
                 rt <- list$rt
                 mzr <- round(mz)
                 sm <- mz * sf
@@ -350,26 +359,27 @@ findohc <-
                         )
 
                 result <- NULL
-                for (i in 1:length(smstep)) {
-                        mini = smstep[i] - smsd
-                        maxi = smstep[i] + smsd
-                        index = sd < maxi & sd > mini
+                for (i in seq_along(smstep)) {
+                        mini <- smstep[i] - smsd
+                        maxi <- smstep[i] + smsd
+                        index <- sd < maxi & sd > mini
 
-                        li <- data[index & ins > cutoffint,]
+                        li <- data[index & ins > cutoffint, ]
                         mzt <- mzr[index & ins > cutoffint]
                         rtt <- rt[index & ins > cutoffint]
                         #dist(mzt) <-
                         if (length(mzt) >= 2) {
                                 #c <- stats::cutree(stats::hclust(stats::dist(mzt)), h = clustercf)
-                                t <- stats::cutree(stats::hclust(stats::dist(rtt)), h = clustercf)
+                                t <-
+                                        stats::cutree(stats::hclust(stats::dist(rtt)), h = clustercf)
                                 # u <- paste0(c, t)
                                 # cn <- length(unique(u))
                                 # lit <- cbind.data.frame(li, u, i)
                                 #
                                 # for (j in 1:cn) {
                                 lit <- cbind.data.frame(li, t, i)
-                                for (j in 1:length(unique(t))){
-                                        li2 <- lit[lit[, 7] == j,]
+                                for (j in seq_along(unique(t))) {
+                                        li2 <- lit[lit[, 7] == j, ]
                                         mzt2 <-
                                                 lit$mzr[lit[, 7] == j]
                                         if (length(mzt2) >= 2) {
@@ -393,7 +403,7 @@ findohc <-
                                 }
                         }
                 }
-                list$ohc <- result[!duplicated(result$mz), ]
+                list$ohc <- result[!duplicated(result$mz),]
                 return(list)
         }
 
@@ -404,22 +414,22 @@ findohc <-
 #' @return list with filtered metabolites mass to charge index of certain compound
 #' @export
 findmet <-
-        function(list, mass, mdr = 50){
+        function(list, mass, mdr = 50) {
+                rmd <- (round(mass) - mass) * 1000
+                rmdall <- (round(list$mz) - list$mz) * 1000
 
-                rmd <- (round(mass) - mass)*1000
-                rmdall <-(round(list$mz) - list$mz)*1000
-
-                if(length(mass)>1){
+                if (length(mass) > 1) {
                         metindex <- NULL
-                        for(i in 1:length(mass)){
-                                metindexi <- rmdall>rmd[i]-mdr & rmdall<rmd[i]+mdr
-                                metindex <- cbind(metindex,metindexi)
+                        for (i in seq_along(mass)) {
+                                metindexi <- rmdall > rmd[i] - mdr & rmdall < rmd[i] + mdr
+                                metindex <-
+                                        cbind(metindex, metindexi)
                         }
                         colnames(metindex) <- mass
                         list$metindex <- metindex
                         return(list)
-                }else{
-                        list$metindex <- rmdall>rmd-mdr & rmdall<rmd+mdr
+                } else{
+                        list$metindex <- rmdall > rmd - mdr & rmdall < rmd + mdr
                         return(list)
                 }
 
@@ -435,12 +445,15 @@ findmet <-
 #' RKMD <- findlipid(list)
 #' @export
 findlipid <-
-        function(list,mode='pos'){
-                if(mode=='pos'|mode=='neg'){
-                        km <- (list$mz * 14 / 14.01565-floor(list$mz * 14 / 14.01565))/0.0134
-                }else{
-                        adduct <- ifelse(mode=='pos',1.008,-1.008)
-                        km <- (((list$mz+adduct) * 14 / 14.01565)-floor((list$mz+adduct) * 14 / 14.01565))/0.0134
+        function(list, mode = 'pos') {
+                if (mode == 'pos' | mode == 'neg') {
+                        km <-
+                                (list$mz * 14 / 14.01565 - floor(list$mz * 14 / 14.01565)) / 0.0134
+                } else{
+                        adduct <- ifelse(mode == 'pos', 1.008, -1.008)
+                        km <-
+                                (((list$mz + adduct) * 14 / 14.01565) - floor((list$mz + adduct) * 14 / 14.01565)) /
+                                0.0134
                 }
                 TAG <- 0.8355
                 DAG <- 0.8719
@@ -451,13 +464,51 @@ findlipid <-
                 PI <- 0.6141
                 PtdG <- 0.6963
                 PtdH <- 0.7422
-                class <- c(TAG,DAG,MAG,PC,PE,PS,PI,PtdG,PtdH)/0.0134
-                t <- as.data.frame(outer(km,class,`-`))
-                s <- t-floor(t)
-                c <- apply(s, 2, function(x) round(x%%1,digits=2) == 0)
-                colnames(t) <- c('TAG_RKMD','DAG_RKMD','MAG_RKMD','PC_RKMD','PE_RKMD','PS_RKMD','PI_RKMD','PtdG_RKMD','PtdH_RKMD')
-                colnames(c) <- c('TAG','DAG','MAG','PC','PE','PS','PI','PtdG','PtdH')
+                class <- c(TAG, DAG, MAG, PC, PE, PS, PI, PtdG, PtdH) /
+                        0.0134
+                t <- as.data.frame(outer(km, class, `-`))
+                s <- t - floor(t)
+                c <-
+                        apply(s, 2, function(x)
+                                round(x %% 1, digits = 2) == 0)
+                colnames(t) <-
+                        c(
+                                'TAG_RKMD',
+                                'DAG_RKMD',
+                                'MAG_RKMD',
+                                'PC_RKMD',
+                                'PE_RKMD',
+                                'PS_RKMD',
+                                'PI_RKMD',
+                                'PtdG_RKMD',
+                                'PtdH_RKMD'
+                        )
+                colnames(c) <-
+                        c('TAG',
+                          'DAG',
+                          'MAG',
+                          'PC',
+                          'PE',
+                          'PS',
+                          'PI',
+                          'PtdG',
+                          'PtdH')
                 t$mz <- list$mz
-                list$RKMD <- cbind.data.frame(t,c)
+                list$RKMD <- cbind.data.frame(t, c)
                 return(list)
         }
+
+#' Find PFCs based on mass defect analysis
+#' @param list list with data as peaks list, mz, rt and group information, retention time should be in seconds
+#' @return list list with potential PFCs compounds index
+#' @references Liu, Y.; D’Agostino, L. A.; Qu, G.; Jiang, G.; Martin, J. W. High-Resolution Mass Spectrometry (HRMS) Methods for Nontarget Discovery and Characterization of Poly- and per-Fluoroalkyl Substances (PFASs) in Environmental and Human Samples. TrAC Trends in Analytical Chemistry 2019, 121, 115420.
+#' @examples
+#' data(list)
+#' pfc <- findpfc(list)
+#' @export
+findpfc <- function(list) {
+        md <- list$mz - round(list$mz)
+        # mass defect -0.1 to 0.15
+        list$pfc <- md > -0.1 & md < 0.15
+        return(list)
+}

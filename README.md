@@ -1,7 +1,7 @@
 enviGCMS: GC-MS Data Analysis for Environmental Science
 ================
 
-[![CRAN status](http://www.r-pkg.org/badges/version/enviGCMS)](https://cran.r-project.org/package=enviGCMS) [![Download counter](http://cranlogs.r-pkg.org/badges/enviGCMS)](https://cran.r-project.org/package=enviGCMS) [![](https://cranlogs.r-pkg.org/badges/grand-total/enviGCMS)](https://cran.r-project.org/package=enviGCMS) [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![Build status](https://api.travis-ci.org/yufree/enviGCMS.svg?branch=master)](https://travis-ci.org/yufree/enviGCMS)
+[![CRAN status](http://www.r-pkg.org/badges/version/enviGCMS)](https://cran.r-project.org/package=enviGCMS) [![Download counter](http://cranlogs.r-pkg.org/badges/enviGCMS)](https://cran.r-project.org/package=enviGCMS) [![](https://cranlogs.r-pkg.org/badges/grand-total/enviGCMS)](https://cran.r-project.org/package=enviGCMS) [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![Build status](https://api.travis-ci.org/yufree/enviGCMS.svg?branch=master)](https://travis-ci.org/yufree/enviGCMS)
 
 `enviGCMS` provides functions for GC/LC-MS data analysis for environmental sciences.
 
@@ -23,7 +23,7 @@ remotes::install_github("yufree/enviGCMS")
 Usage
 -----
 
-Check this [vignette](http://yufree.github.io/enviGCMS/articles/GCMSDA.html) for Data analysis of GC-MS and LC-MS in Envrionmental Science.
+Check this [vignette](http://yufree.github.io/enviGCMS/articles/GCMSDA.html) for Data analysis of GC-MS and LC-MS in Environmental Science.
 
 Check this [vignette](http://yufree.github.io/enviGCMS/articles/PooledQC.html) for Pooled QC analysis in Environmental Science.
 
@@ -80,5 +80,5 @@ plotmz(data)
 findline(data)
 ~~~
 
-Detailed usage of those functions in Environmental analysis could be found in this [paper](http://www.sciencedirect.com/science/article/pii/S0039914016309298) and the vignettes in this package.
+Detailed usage of those functions in Environmental analysis could be found in this [paper](https://www.sciencedirect.com/science/article/pii/S0039914016309298) and the vignettes in this package.
 

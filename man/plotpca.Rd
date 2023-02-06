@@ -8,8 +8,8 @@ plotpca(
   data,
   lv = NULL,
   index = NULL,
-  center = T,
-  scale = T,
+  center = TRUE,
+  scale = TRUE,
   xrange = NULL,
   yrange = NULL,
   pch = NULL,
@@ -17,7 +17,7 @@ plotpca(
 )
 }
 \arguments{
-\item{data}{mzrt profile with row peaks and column samples}
+\item{data}{data row as peaks and column as samples}
 
 \item{lv}{group information}
 
@@ -31,7 +31,7 @@ plotpca(
 
 \item{yrange}{y axis range for return samples, default NULL}
 
-\item{pch}{deault pch would be the first charactor of group information or samples name}
+\item{pch}{default pch would be the first character of group information or samples name}
 
 \item{...}{other parameters for `plot` function}
 }

@@ -1,3 +1,41 @@
+# enviGCMS 0.7.1
+
+- CRAN
+
+# enviGCMS 0.7.0
+
+- update MDplotR shiny documents
+- change class to inherits
+- fix save issue
+
+# enviGCMS 0.6.9
+
+- update writeMSP function
+- add findpfc to find potential PFCs
+- add getpn to connect pos and neg mode data and return mzrt object
+- add support for xcms 3 EIC extraction
+- add getcompare to align multiple mzrt objects
+
+# enviGCMS 0.6.8
+
+- goodpractice check
+- spell check
+
+# enviGCMS 0.6.7
+
+- fix bug in getpower function
+- change default par parameters for plotmrc
+- remove the export of deprecated function
+- fix the typo in documents
+- improve getMSP to fit MoNA MSP format
+- add getalign function to align two peaks vectors and remove getoverlapmass, getoverlaprt
+- modify getmass to accept negative value
+- add getms1anno for MS1 annotation by local compounds database with predefined paired mass distances
+- add support to save target data csv without change default name
+- add retention time alignment function for peaks lists
+- add getalign2 function to align mass to charge ratio, retention time for the same peak list, this function could be used to refine peaks list
+- fix color issues in plotrla and plotridge function
+
 # enviGCMS 0.6.6
 
 - CRAN
@@ -5,7 +43,7 @@
 # enviGCMS 0.6.5
 
 - change to formal group information for mzrt class
-- fix log infinate issue in plotridge
+- fix log infinite issue in plotridge
 - update list data
 
 # enviGCMS 0.6.4
@@ -104,7 +142,7 @@
 - use list to communicate results between function instead of xcms objects
 - getdoe function to handle data for various experimental design
 - add functions and shiny application for Short-Chain Chlorinated Paraffins analysis
-- update the visulization function
+- update the visualization function
 - support xcms 3 new objects
 
 # enviGCMS 0.4.5
@@ -132,7 +170,7 @@
 ## Minor changes
 
 - Add Mode function
-- reformate code by formatR package
+- reformat code by formatR package
 
 # enviGCMS 0.4.3
 
@@ -172,7 +210,7 @@
 - remove svadata and svaupload
 - add mzrtsim to simulate mzrt profile
 - add simmzrt to make simulation input data
-- add rlaplot and ridagesplot to show the distribution of the data
+- add rlaplot and ridgesplot to show the distribution of the data
 
 ## Minor changes
 

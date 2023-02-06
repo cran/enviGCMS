@@ -38,7 +38,7 @@ plotdwtus(list)
 ## -----------------------------------------------------------------------------
 order <- 1:12
 # n means how many points to build a linear regression model
-n = 5
+n <- 5
 idx <- getpqsi(list$data,order,n = n)
 plot(idx~order[-(1:(n-1))],pch=19)
 

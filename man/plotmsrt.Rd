@@ -2,9 +2,9 @@
 % Please edit documentation in R/general.R
 \name{plotmsrt}
 \alias{plotmsrt}
-\title{Plot EIC of certain m/z and return dataframe for intergration}
+\title{Plot EIC of certain m/z and return dataframe for integration}
 \usage{
-plotmsrt(data, ms, rt, n = F)
+plotmsrt(data, ms, rt, n = FALSE)
 }
 \arguments{
 \item{data}{imported data matrix of GC-MS}
@@ -19,7 +19,7 @@ plotmsrt(data, ms, rt, n = F)
 dataframe with  with the first column RT and second column intensity of the SIM ions.
 }
 \description{
-Plot EIC of certain m/z and return dataframe for intergration
+Plot EIC of certain m/z and return dataframe for integration
 }
 \examples{
 \dontrun{

@@ -1,8 +1,7 @@
 Package: enviGCMS
 Type: Package
 Title: GC/LC-MS Data Analysis for Environmental Science
-Version: 0.6.6
-Date: 2020-06-04
+Version: 0.7.1
 Authors@R: c(person(given = "Miao", family = "YU",
         role = c("aut", "cre"), 
         email = "yufreecas@gmail.com",
@@ -11,9 +10,9 @@ Authors@R: c(person(given = "Miao", family = "YU",
         role = c("ctb"), 
         email = "Thanh.Wang@oru.se",
         comment = c(ORCID = "0000-0002-5729-1908")))
-Maintainer: Miao YU <yufreecas@gmail.com>
 Description: Gas/Liquid Chromatography-Mass Spectrometer(GC/LC-MS) Data Analysis for Environmental Science. This package covered topics such molecular isotope ratio, matrix effects and Short-Chain Chlorinated Paraffins analysis etc. in environmental analysis.
 URL: https://github.com/yufree/enviGCMS
+BugReports: https://github.com/yufree/enviGCMS/issues
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
@@ -24,11 +23,12 @@ biocViews:
 Depends: R (>= 2.10)
 Imports: Rdisop, BiocParallel, grDevices, graphics, stats, utils,
         methods, animation (>= 2.2.3), RColorBrewer, mixtools,
-        data.table
-RoxygenNote: 7.1.0
+        data.table, igraph
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2020-06-04 14:33:12 UTC; yufree
+Packaged: 2023-02-05 23:31:18 UTC; yufree
 Author: Miao YU [aut, cre] (<https://orcid.org/0000-0002-2804-6014>),
   Thanh Wang [ctb] (<https://orcid.org/0000-0002-5729-1908>)
+Maintainer: Miao YU <yufreecas@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-06-04 15:20:06 UTC
+Date/Publication: 2023-02-06 08:42:34 UTC

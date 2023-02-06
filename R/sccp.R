@@ -1,4 +1,4 @@
-#' Short-Chain Chlorinated Paraffins(SCCPs) peaks infomation for quantitative analysis
+#' Short-Chain Chlorinated Paraffins(SCCPs) peaks information for quantitative analysis
 #'
 #' A dataset containing the ions, formula, Cl%, peak abundances for all SCCPs compounds
 #' @docType data
@@ -46,22 +46,23 @@ getareastd <- function(data = NULL,
         } else {
                 eicis <- xcms::getEIC(data, mz = c(mzhis, mzlis))
                 dfis <- eicis@eic$xcmsRaw[[1]]
-                dfis <- dfis[dfis[, 1] > rts[1] & dfis[, 1] < rts[2],]
+                dfis <-
+                        dfis[dfis[, 1] > rts[1] & dfis[, 1] < rts[2], ]
                 areais <- sum(diff(dfis[, 1]) * dfis[-1, 2])
         }
 
         area <- vector()
         if (is.null(rt)) {
-                for (i in 1:length(mz)) {
+                for (i in seq_along(mz)) {
                         eici <- xcms::getEIC(data, mz = c(mzh[i], mzl[i]))
                         df <- eici@eic$xcmsRaw[[1]]
                         area[i] <- sum(diff(df[, 1]) * df[-1, 2])
                 }
         } else {
-                for (i in 1:length(mz)) {
+                for (i in seq_along(mz)) {
                         eici <- xcms::getEIC(data, mz = c(mzh[i], mzl[i]))
                         df <- eici@eic$xcmsRaw[[1]]
-                        df <- df[df[, 1] > rt[1] & df[, 1] < rt[2],]
+                        df <- df[df[, 1] > rt[1] & df[, 1] < rt[2], ]
                         area[i] <- sum(diff(df[, 1]) * df[-1, 2])
                 }
         }
@@ -88,7 +89,7 @@ getareastd <- function(data = NULL,
         )
         return(list)
 }
-#' Get the peak information from sampels for SCCPs detection
+#' Get the peak information from samples for SCCPs detection
 #' @param data list from `xcmsRaw` function
 #' @param ismz internal standards m/z
 #' @param ppm resolution of mass spectrum
@@ -115,22 +116,23 @@ getarea <- function(data,
         } else {
                 eicis <- xcms::getEIC(data, mz = c(mzhis, mzlis))
                 dfis <- eicis@eic$xcmsRaw[[1]]
-                dfis <- dfis[dfis[, 1] > rts[1] & dfis[, 1] < rts[2],]
+                dfis <-
+                        dfis[dfis[, 1] > rts[1] & dfis[, 1] < rts[2], ]
                 areais <- sum(diff(dfis[, 1]) * dfis[-1, 2])
         }
 
         area <- vector()
         if (is.null(rt)) {
-                for (i in 1:length(mz)) {
+                for (i in seq_along(mz)) {
                         eici <- xcms::getEIC(data, mz = c(mzh[i], mzl[i]))
                         df <- eici@eic$xcmsRaw[[1]]
                         area[i] <- sum(diff(df[, 1]) * df[-1, 2])
                 }
         } else {
-                for (i in 1:length(mz)) {
+                for (i in seq_along(mz)) {
                         eici <- xcms::getEIC(data, mz = c(mzh[i], mzl[i]))
                         df <- eici@eic$xcmsRaw[[1]]
-                        df <- df[df[, 1] > rt[1] & df[, 1] < rt[2],]
+                        df <- df[df[, 1] > rt[1] & df[, 1] < rt[2], ]
                         area[i] <- sum(diff(df[, 1]) * df[-1, 2])
                 }
         }
@@ -176,13 +178,13 @@ getsccp <- function(pathstds,
                     con = 2000,
                     rt = NULL,
                     rts = NULL,
-                    log = T) {
+                    log = TRUE) {
         pathstd <- list.files(path = pathstds,
-                              full.names = T,
-                              recursive = T)
+                              full.names = TRUE,
+                              recursive = TRUE)
         pathsamp <- list.files(path = pathsample,
-                               full.names = T,
-                               recursive = T)
+                               full.names = TRUE,
+                               recursive = TRUE)
         nstd <- length(pathstd)
         nsamp <- length(pathsamp)
         # process SCCPs standards
@@ -198,10 +200,10 @@ getsccp <- function(pathstds,
                         rts = rts
                 )
         }
-        pCl <- sapply(liststd, function(x)
-                x$sumpCl)
-        rarea <- sapply(liststd, function(x)
-                x$sumrarea)
+        pCl <- vapply(liststd, function(x)
+                x$sumpCl, 1)
+        rarea <- vapply(liststd, function(x)
+                x$sumrarea, 1)
 
         # get the slope and intercept
         if (log) {
@@ -225,11 +227,11 @@ getsccp <- function(pathstds,
                 )
         }
 
-        pCls <- sapply(listsamp, function(x)
-                x$sumpCl)
-        rareas <- sapply(listsamp, function(x)
-                x$sumrarea)
-        # get the concertration
+        pCls <- vapply(listsamp, function(x)
+                x$sumpCl, 1)
+        rareas <- vapply(listsamp, function(x)
+                x$sumrarea, 1)
+        # get the concentration
         if (log) {
                 rareasc <- exp(pCls * slope + intercept)
         } else {
