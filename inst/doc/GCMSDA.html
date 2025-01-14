@@ -12,7 +12,7 @@
 
 <meta name="author" content="Miao Yu" />
 
-<meta name="date" content="2023-02-05" />
+<meta name="date" content="2025-01-13" />
 
 <title>Data analysis of GC-MS and LC-MS in Environmental Science</title>
 
@@ -240,7 +240,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Data analysis of GC-MS and LC-MS in
 Environmental Science</h1>
 <h4 class="author">Miao Yu</h4>
-<h4 class="date">2023-02-05</h4>
+<h4 class="date">2025-01-13</h4>
 
 
 
@@ -280,6 +280,8 @@ time as a time series data. In this package, we treat such data as
 </div>
 <div id="data-input" class="section level3">
 <h3>Data input</h3>
+<p><em>Since version 0.7.4, those functions have been removed from the
+package. </em></p>
 <p>You could use <code>getmd</code> to import the mass spectrum data as
 supported by <code>xcms</code> and get the profile of GC-MS data matrix.
 <code>mzstep</code> is the bin step for mass:</p>
@@ -296,13 +298,6 @@ of retention time by <code>cbmd</code>:</p>
 <p>You could plot the Total Ion Chromatogram(TIC) for certain RT and
 mass range.</p>
 <pre><code>plottic(data,rt=c(3.1,25),ms=c(100,1000))</code></pre>
-<p>You could also plot the mass spectrum for certain RT range. You could
-use the returned MSP files for NIST search:</p>
-<pre><code>plotrtms(data,rt=c(3.1,25),ms=c(100,1000))</code></pre>
-<p>The Extracted Ion Chromatogram(EIC) is also support by
-<code>enviGCMS</code> and the returned data could be analyzed for
-molecular isotopes:</p>
-<pre><code>plotmsrt(data,ms=500,rt=c(3.1,25))</code></pre>
 <p>You could use <code>plotms</code> or <code>plotmz</code> to show the
 heatmap or scatter plot for LC/GC-MS data, which is very useful for
 exploratory data analysis.</p>
@@ -360,6 +355,8 @@ specific functions such as group comparison, batch correction and
 visualization are also included.</p>
 <div id="wrap-function-for-xcms-package" class="section level3">
 <h3>Wrap function for <code>xcms</code> package</h3>
+<p><em>Since version 0.7.4, those functions have been removed from the
+package. </em></p>
 <ul>
 <li><p><code>getdata</code> could be used to get the
 <code>xcmsSet</code> object in one step with optimized methods</p></li>

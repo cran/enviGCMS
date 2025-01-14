@@ -1,3 +1,24 @@
+# enviGCMS 0.8.0
+
+- remove the dependency of xcms package
+
+# enviGCMS 0.7.4
+
+- CRAN
+- remove rdisop related example
+- update citation
+- remove dependency of xcms and msnbase
+- add onAttach message for bioc packages
+
+# enviGCMS 0.7.3
+
+- fix getalign2 to accept mz vector without ordering
+- fix getalign ppm bug
+
+# enviGCMS 0.7.2
+
+- adope MoNA msp format for getMSP
+
 # enviGCMS 0.7.1
 
 - CRAN
