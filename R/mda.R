@@ -100,7 +100,7 @@ getmdr <- function(mz) {
 #' @return high order Mass Defect with details
 #' @examples
 #' \dontrun{
-#' getmdh(getmass('C2H4')))
+#' getmdh(getmass('C2H4'))
 #' }
 #' @export
 getmdh <- function(mz,
@@ -157,7 +157,7 @@ getmdh <- function(mz,
                         MD2 <-
                                 round(ceiling(signif(smd)) - smd,
                                       digits = 6)
-                        re <- cbind.data.frame(mz, MD1, MD1)
+                        re <- cbind.data.frame(mz, MD1, MD2)
                 }
         } else if (length(cus) == 3) {
                 omd <- mz * round(cus[1]) / cus[1]
@@ -268,7 +268,7 @@ getmdh <- function(mz,
                         md3 <- round(floor(tsmd) - tsmd,
                                      digits = 6)
                         tmd <- MD2 / md3
-                        MD1_3 <-
+                        MD3 <-
                                 round(floor(tmd) - tmd,
                                       digits = 6)
                         re <- cbind.data.frame(mz, MD1, MD2, MD3)
@@ -341,7 +341,7 @@ findohc <-
                  cutoffr = 0.4,
                  clustercf = 10) {
                 mz <- list$mz
-                ins <- apply(list$data, 1, mean, na.rm = TRUE)
+                intensity <- apply(list$data, 1, mean, na.rm = TRUE)
                 rt <- list$rt
                 mzr <- round(mz)
                 sm <- mz * sf
@@ -354,7 +354,7 @@ findohc <-
                                 mzr = mzr,
                                 sm = sm,
                                 sd = sd,
-                                ins = ins,
+                                intensity = intensity,
                                 rt = rt
                         )
 
@@ -364,9 +364,9 @@ findohc <-
                         maxi <- smstep[i] + smsd
                         index <- sd < maxi & sd > mini
 
-                        li <- data[index & ins > cutoffint, ]
-                        mzt <- mzr[index & ins > cutoffint]
-                        rtt <- rt[index & ins > cutoffint]
+                        li <- data[index & intensity > cutoffint, ]
+                        mzt <- mzr[index & intensity > cutoffint]
+                        rtt <- rt[index & intensity > cutoffint]
                         #dist(mzt) <-
                         if (length(mzt) >= 2) {
                                 #c <- stats::cutree(stats::hclust(stats::dist(mzt)), h = clustercf)
@@ -383,18 +383,18 @@ findohc <-
                                         mzt2 <-
                                                 lit$mzr[lit[, 7] == j]
                                         if (length(mzt2) >= 2) {
-                                                if (length(unique(li2$ins)) > 1) {
-                                                        ratio <- max(li2$ins[li2$ins != max(li2$ins)]) / max(li2$ins)
+                                                if (length(unique(li2$intensity)) > 1) {
+                                                        ratio <- max(li2$intensity[li2$intensity != max(li2$intensity)]) / max(li2$intensity)
                                                         diff <-
-                                                                abs(li2$mzr[round(li2$ins) == round(max(li2$ins[li2$ins != max(li2$ins)]))] - li2$mzr[which.max(li2$ins)])
+                                                                abs(li2$mzr[round(li2$intensity) == round(max(li2$intensity[li2$intensity != max(li2$intensity)]))] - li2$mzr[which.max(li2$intensity)])
                                                 } else{
                                                         ratio <- 1
                                                         diff <-
                                                                 abs(li2$mzr[1] - li2$mzr[2])
                                                 }
 
-                                                if (ratio > cutoffr &
-                                                    round(diff) == 2) {
+                                                 if (ratio > cutoffr &&
+                                                     any(round(diff) == 2)) {
                                                         li2 <- cbind.data.frame(li2, ratio)
                                                         result <-
                                                                 as.data.frame(rbind(result, li2))
@@ -446,11 +446,13 @@ findmet <-
 #' @export
 findlipid <-
         function(list, mode = 'pos') {
-                if (mode == 'pos' | mode == 'neg') {
+                if (mode == 'none') {
                         km <-
                                 (list$mz * 14 / 14.01565 - floor(list$mz * 14 / 14.01565)) / 0.0134
                 } else{
-                        adduct <- ifelse(mode == 'pos', 1.008, -1.008)
+                        # 'pos' assumes [M+H]+ (subtract a proton to reach the
+                        # neutral mass); 'neg' assumes [M-H]- (add a proton)
+                        adduct <- ifelse(mode == 'pos', -1.008, 1.008)
                         km <-
                                 (((list$mz + adduct) * 14 / 14.01565) - floor((list$mz + adduct) * 14 / 14.01565)) /
                                 0.0134

@@ -1,6 +1,57 @@
+# enviGCMS 0.9.0
+
+## Breaking changes
+
+- Remove all deprecated functions from v0.7.x (32 functions including `getdata`, `getdata2`, `getmzrt2`, `svabatch`, `svaplot`, etc.). Users should migrate to current API.
+- Remove `Mode()` (statistical mode function) -- unused internally since `getmdg()` moved to pmd package.
+- Standardize API naming conventions:
+  - Intensity column renamed from `ins` to `intensity` in `getMSP()` and `writeMSP()` spectra data.frames.
+  - Rename `Integration()` to `integration()`, `GetIntegration()` to `getintegration()`, `Getisotopologues()` to `getisotopologues()` for consistent lowercase naming.
+
+## New features (merged from MSxplorer)
+
+- Add `HRMF()` for high-resolution mass filtering with forward/reverse scoring and Figure of Merit (FoM), based on Kwiecien et al. (2015). Uses Rdisop instead of rcdk/rJava -- no new hard dependencies.
+- Add `getHRMF()` for batch HRMF processing of entire MSP files.
+- Add `adduct` argument to `HRMF()`/`getHRMF()` for ESI adduct ions (`[M+H]+`, `[M+Na]+`, `[M+NH4]+`, `[M+K]+`, `[M+H-H2O]+`, `[M-H]-`, `[M+Cl]-`, `[M+HCOO]-`, `[M+CH3COO]-`, or user-defined named mass deltas); fragment m/z are converted internally and scores gain an `Adduct` column.
+- Add `cleanMGF()` to clean MGF files by keeping only fragment peaks explainable as sub-formulae of the best precursor formula candidate (derived from `PEPMASS`/`CHARGE` and the supplied adduct); the chosen formula is stored as a `FORMULA=` header.
+- Add `plotEIC()` for extracted ion chromatogram plotting from mzML/mzXML files using RaMS.
+- Add `plotTopMS1Peaks()` interactive Shiny app to extract top MS1 ions from MS2 chromatograms.
+- Add `plotTopMS2Peaks()` interactive Shiny app to extract top MS2 ions from MS1 chromatograms.
+
+## Bug fixes
+
+- Fix `getmdh()`: `cbind.data.frame(mz, MD1, MD1)` corrected to `cbind.data.frame(mz, MD1, MD2)` for ceiling method.
+- Fix `HRMF()`: remove a doubled electron-mass shift (about 0.55 mDa bias) in the `decomposeMass()` query, and fall back to all candidates when Rdisop's parity filter rejects every sub-formula for a peak (the closed-shell molecular formula was never annotated at charge +/-1).
+- Fix `runMDPlot()`: filename case mismatch (`MDPlot.rmd` -> `mdplot.Rmd`).
+- Fix `getdoe()`: `sum(NROW(lv) > 1) != 0` (always TRUE) corrected to `NROW(lv) > 1`.
+- Fix `getMSP()`: extract duplicated peak-parsing code into internal helper.
+- Fix `getmzrtcsv()`: remove broken cross-reference to deleted `getmzrt`.
+- Fix `integration()`: RT/noise window subsetting compared `> upper & < lower` (always empty), corrected to `> lower & < upper` so the function returns a real peak area.
+- Fix `getmdh()`: `floor` method with more than three units assigned to `MD1_3` instead of `MD3`, causing an "object 'MD3' not found" error.
+- Fix `getintegration()`: `m <= 2` branch referenced an undefined `t` and mis-parenthesised the per-scan `delta_t`; now computes `(last - first) / (n - 1)`.
+- Fix `findlipid()`: `mode` branch logic was inverted -- `pos`/`neg` applied no adduct correction while the neutral branch held an unreachable `ifelse`. `pos` now corrects `[M+H]+` and `neg` corrects `[M-H]-` to neutral mass; `none` is unchanged.
+- Fix `gifmr()`: default `imputation = "i"` was not a valid `getimputation()` method (silently skipped imputation); changed to `"l"`.
+- Register `c.mzrt()` as an S3 method so `c()` dispatches on `mzrt` objects.
+- `getcsv()`: warn instead of silently doing nothing when `type` contains none of `m`/`a`/`p`/`o`.
+- Remove dead code in `getpn()` (two discarded subset expressions).
+
+## Dependency changes
+
+- Move `animation` from Imports to Suggests (only used by `gifmr()`).
+- Move `mixtools` from Imports to Suggests (only used by `getimputation()`).
+- Add `RaMS` to Suggests for lightweight mzML/mzXML access (replaces MSnbase).
+- Hard Imports reduced from 11 to 8 packages.
+
+## Code quality
+
+- Add unit tests across 10 test files (was 1 test), including regression tests for the bug fixes above.
+- Refactor `HRMF()` from 285-line monolith into 135-line function with 4 internal helpers.
+- Remove 809 lines of dead deprecated code and 35 orphan man pages.
+
 # enviGCMS 0.8.0
 
 - remove the dependency of xcms package
+- fix ppm issue in getpn
 
 # enviGCMS 0.7.4
 

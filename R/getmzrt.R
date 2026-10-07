@@ -5,7 +5,10 @@ is.mzrt <- function(x)
         inherits(x, "mzrt")
 #' c method for mzrt object
 #'
-#' @noRd
+#' @param x an mzrt object
+#' @param ... further mzrt objects to concatenate
+#' @return a combined mzrt object
+#' @exportS3Method
 c.mzrt <- function(x, ...) {
         li <- list(x, ...)
         re <- list()
@@ -60,6 +63,12 @@ getcsv <-
                  target = FALSE,
                  ...) {
                 if (!is.null(name)) {
+                        if (!grepl('[mapo]', type)) {
+                                warning(
+                                        "`type` must contain at least one of 'm', 'a', 'p' or 'o'; no file written.",
+                                        call. = FALSE
+                                )
+                        }
                         if (grepl('m', type)) {
                                 sample_group <- list$group[,-1]
                                 data <-
@@ -354,8 +363,8 @@ getdoe <- function(list,
         lv <- list$group[,-1, drop = FALSE]
         cols <- colnames(lv)
         # one peak for metabolomics is hard to happen
-        if (sum(NROW(lv) > 1) != 0) {
-                if (sum(NCOL(lv) > 1)) {
+        if (NROW(lv) > 1) {
+                if (NCOL(lv) > 1) {
                         mlv <- do.call(paste0, c(lv[cols], sep = ""))
                 } else {
                         mlv <- unlist(lv)
@@ -544,7 +553,7 @@ getpqsi <- function(data, order, n = 5) {
 }
 
 #' Perform peaks list alignment and return features table
-#' @param list each element should be a data.frame with mz, rt and ins as m/z, retention time in seconds and intensity of certain peaks.
+#' @param list each element should be a data.frame with mz, rt and intensity as m/z, retention time in seconds and intensity of certain peaks.
 #' @param ts template sample index in the list, default 1
 #' @param ppm mass accuracy, default 10
 #' @param deltart retention time shift table, default 5 seconds
@@ -560,7 +569,7 @@ getretcor <- function(list,
         csd <- list[[ts]]
         i <- 1
         df1 <- csd
-        ins <- df1$ins
+        intensity <- df1$intensity
         while (i <= length(nli)) {
                 df2 <- list[[i]]
                 df <-
@@ -573,24 +582,24 @@ getretcor <- function(list,
                 mr2 <- paste0(df2$mz, '@', df2$rt)
                 mrx <- paste0(df$mz2, '@', df$rt2)
 
-                df$ins2 <- df2$ins[match(mrx, mr2)]
+                df$intensity2 <- df2$intensity[match(mrx, mr2)]
                 dfx <- df[!duplicated(df$xid),]
-                dfx$ins2 <-
-                        stats::aggregate(df$ins2, by = list(df$xid), FUN)[, 2]
+                dfx$intensity2 <-
+                        stats::aggregate(df$intensity2, by = list(df$xid), FUN)[, 2]
                 df1 <- cbind.data.frame(mz = dfx$mz1, rt = dfx$rt1)
-                if (length(dim(ins)) > 1) {
-                        insn <- ins[df$xid,]
-                        ins <-
-                                cbind.data.frame(insn[!duplicated(df$xid),], dfx$ins2)
+                if (length(dim(intensity)) > 1) {
+                        intensityn <- intensity[df$xid,]
+                        intensity <-
+                                cbind.data.frame(intensityn[!duplicated(df$xid),], dfx$intensity2)
                 } else{
-                        insn <- ins[df$xid]
-                        ins <-
-                                cbind.data.frame(ins1 = insn[!duplicated(df$xid)], dfx$ins2)
+                        intensityn <- intensity[df$xid]
+                        intensity <-
+                                cbind.data.frame(intensity1 = intensityn[!duplicated(df$xid)], dfx$intensity2)
                 }
                 i <- i + 1
         }
-        colnames(ins) <- paste0('ins', seq_along(list))
-        li <- list(data = ins,
+        colnames(intensity) <- paste0('intensity', seq_along(list))
+        li <- list(data = intensity,
                    mz = df1[, 1],
                    rt = df1[, 2])
         return(li)
@@ -617,8 +626,8 @@ getpn <- function(pos,
                 diff <- round((pos$mz[i] - neg$mz), digits)
                 mzr <-
                         data.table::as.data.table(cbind.data.frame(
-                                mzmin = pmd * (1 - ppm * 10e-6),
-                                mzmax = pmd * (1 + ppm * 10e-6)
+                                mzmin = pmd * (1 - ppm * 1e-6),
+                                mzmax = pmd * (1 + ppm * 1e-6)
                         ))
                 colnames(mzr) <- c("min", "max")
                 data.table::setkey(mzr, min, max)
@@ -668,8 +677,6 @@ getpn <- function(pos,
                 match(paste(merge2$pos, merge2[, 2]), paste(pos$mz, pos$rt))
         idxn <-
                 match(paste(merge2$neg, merge2[, 4]), paste(neg$mz, neg$rt))
-        pos$anno[idxp]
-        neg$anno[idxn]
         colnames(neg$data) <- colnames(pos$data)
 
 
@@ -735,10 +742,18 @@ getcompare <- function(...,
                                 ppm = ppm,
                                 deltart = deltart
                         )
+                rowindex_x <- TRUE
+                if (!is.null(over) && nrow(over) > 0) {
+                        rowindex_x <- -unique(over$xid)
+                }
+                rowindex_ref <- FALSE
+                if (!is.null(over2) && nrow(over2) > 0) {
+                        rowindex_ref <- unique(over2$xid)
+                }
                 refi <-
-                        enviGCMS::getfilter(x, rowindex = -unique(over$xid))
+                        enviGCMS::getfilter(x, rowindex = rowindex_x)
                 refo <-
-                        enviGCMS::getfilter(ref, rowindex = unique(over2$xid))
+                        enviGCMS::getfilter(ref, rowindex = rowindex_ref)
                 ni <- c(refi, refo)
                 return(ni)
         })

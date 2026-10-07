@@ -12,7 +12,7 @@
 
 <meta name="author" content="Miao Yu" />
 
-<meta name="date" content="2025-01-13" />
+<meta name="date" content="2026-10-07" />
 
 <title>Data analysis of GC-MS and LC-MS in Environmental Science</title>
 
@@ -240,7 +240,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Data analysis of GC-MS and LC-MS in
 Environmental Science</h1>
 <h4 class="author">Miao Yu</h4>
-<h4 class="date">2025-01-13</h4>
+<h4 class="date">2026-10-07</h4>
 
 
 
@@ -353,24 +353,12 @@ samples within certain retention time and m/z. <code>enviGCMS</code>
 package has some wrapped function to get the peaks list. Besides, some
 specific functions such as group comparison, batch correction and
 visualization are also included.</p>
-<div id="wrap-function-for-xcms-package" class="section level3">
-<h3>Wrap function for <code>xcms</code> package</h3>
-<p><em>Since version 0.7.4, those functions have been removed from the
-package. </em></p>
+<div id="importing-peaks-list-data" class="section level3">
+<h3>Importing peaks list data</h3>
 <ul>
-<li><p><code>getdata</code> could be used to get the
-<code>xcmsSet</code> object in one step with optimized methods</p></li>
-<li><p><code>getdata2</code> could be used to get the
-<code>XCMSnExp</code> object in one step with optimized methods</p></li>
-<li><p><code>getmzrt</code> could get a list as <code>mzrt</code> object
-with peaks list, mz, retention time and class of samples from
-<code>xcmsSet</code>/<code>XCMSnExp</code> object. You could also save
-related <code>xcmsSet</code> and <code>xcmsEIC</code> object for further
-analysis. It also support to output the file for metaboanalyst,
-xMSannotator, Mummichog pathway analysis and paired mass distance(PMD)
-analysis.</p></li>
-<li><p><code>getmzrtcsv</code> could read in the csv files and return a
-list for peaks list as <code>mzrt</code> object</p></li>
+<li><code>getmzrtcsv</code> can read in a CSV file of the peaks list and
+return an <code>mzrt</code> list object with the peaks list, m/z,
+retention time, and sample groups.</li>
 </ul>
 </div>
 <div id="data-imputation-and-filtering" class="section level3">

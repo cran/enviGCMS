@@ -10,22 +10,6 @@
 #' @format A matrix object from raw mass spectrometry data. The list is generated from faahKO package.
 "matrix"
 
-#' define the Mode function
-#' @param x vector
-#' @return Mode of the vector
-#' @export
-Mode <- function(x) {
-        ta <- table(x)
-        tam <- max(ta)
-        if (all(ta == tam))
-                mod <- x
-        else if (is.numeric(x))
-                mod <- as.numeric(names(ta)[ta == tam])
-        else
-                mod <- names(ta)[ta == tam]
-        return(mod)
-}
-
 #' filter data by average moving box
 #'
 #' @param x a vector
@@ -753,6 +737,9 @@ plotsms <- function(meanmatrix, rsdmatrix) {
 #' }
 #' @export
 plothist <- function(data) {
+        if (!requireNamespace("mixtools", quietly = TRUE)) {
+                stop("Package 'mixtools' is required for plothist. Install with: install.packages('mixtools')", call. = FALSE)
+        }
         data1 <- sample(data, 1e+05)
         mixmdl <- mixtools::normalmixEM(log10(data1))
         graphics::plot(mixmdl,
@@ -818,21 +805,21 @@ plotcc <- function(x, y, upper, lower = upper, ...) {
 #' @return area integration data
 #' @examples
 #' \dontrun{
-#' area <- Integration(data)
+#' area <- integration(data)
 #' }
 #' @export
-Integration <- function(data,
+integration <- function(data,
                         rt = c(8.3, 9),
                         brt = c(8.3,
                                 8.4),
                         smoothit = TRUE) {
         # subset the data
-        subdata <- data[data[, 1] > rt[2] & data[, 1] < rt[1],]
+        subdata <- data[data[, 1] > rt[1] & data[, 1] < rt[2],]
         # get the signal and the RT
         RTrange <- subdata[, 1]
         signal <- subdata[, 2]
         # subset the noise
-        subnoise <- data[data[, 1] > brt[2] & data[, 1] < brt[1],]
+        subnoise <- data[data[, 1] > brt[1] & data[, 1] < brt[2],]
         # get the noise and the RT
         RTrange2 <- subnoise[, 1]
         noise <- subnoise[, 2]
@@ -853,7 +840,7 @@ Integration <- function(data,
         return(area)
 }
 
-#' GetIntegration was mainly used for get the integration of certain ion's chromatogram data and plot the data
+#' getintegration was mainly used for get the integration of certain ion's chromatogram data and plot the data
 #' @param data file should be a dataframe with the first column RT and second column intensity of the SIM ions.
 #' @param rt a rough RT range contained only one peak to get the area
 #' @param n points in the moving average smooth box, default value is 5
@@ -866,10 +853,10 @@ Integration <- function(data,
 #' @return integration data such as peak area, peak height, signal and the slope data.
 #' @examples
 #' \dontrun{
-#' list <- GetIntegration(data)
+#' list <- getintegration(data)
 #' }
 #' @export
-GetIntegration <- function(data,
+getintegration <- function(data,
                            rt = c(8.3, 9),
                            n = 5,
                            m = 5,
@@ -907,8 +894,8 @@ GetIntegration <- function(data,
                 # for n = 2 points; without linear regression (much
                 # faster) time per scan in millisec
                 delta_t <-
-                        (t[length(RTrangemsec)] - RTrangemsec[1] / (length(RTrangemsec) -
-                                                                            1))
+                        (RTrangemsec[length(RTrangemsec)] - RTrangemsec[1]) / (length(RTrangemsec) -
+                                                                            1)
                 for (i in 2:length(signal)) {
                         slopedata[i] <- (signal[i] - signal[i - 1]) / delta_t
                 }
@@ -1029,10 +1016,10 @@ GetIntegration <- function(data,
 #' @examples
 #' \dontrun{
 #' # show isotopologues
-#' Getisotopologues(formula = 'C6H11O6', charge = 1, width = 0.3)
+#' getisotopologues(formula = 'C6H11O6', charge = 1, width = 0.3)
 #' }
 #' @export
-Getisotopologues <- function(formula = "C6H11O6",
+getisotopologues <- function(formula = "C6H11O6",
                              charge = 1,
                              width = 0.3) {
         # input the formula and charge for your molecular,
